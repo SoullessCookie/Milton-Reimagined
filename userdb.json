@@ -1,0 +1,23 @@
+{
+  "users": 
+  [
+    {"userid": "", "level": 0, "balance": },
+    {"userid": "", "level": 0, "balance": 0},
+    {"userid": "", "level": 0, "balance": 0},
+    {"userid": "", "level": 0, "balance": 0},
+    {"userid": "", "level": 0, "balance": 0},
+    {"userid": "", "level": 0, "balance": 0},
+  
+  ]
+  "servers": 
+  [
+    {"serverid": ""},
+    {"serverid": ""},
+    {"serverid": ""},
+    {"serverid": ""},
+    {"serverid": ""},
+    {"serverid": ""},
+    {"serverid": ""},
+  
+  ]
+}
