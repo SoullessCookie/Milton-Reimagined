@@ -58,4 +58,4 @@ exec('node deploy-commands.js', (error) => {
   }
 });
 
-client.login(token);
+client.login(process.env.token);
