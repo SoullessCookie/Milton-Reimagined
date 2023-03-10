@@ -2,6 +2,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
 const { token } = require('./config.json');
+const { exec } = require('child_process');
+const { pm2 } = require('pm2');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -9,6 +11,14 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
   console.log(`Ready! Logged in as ${c.user.tag}`);
+
+  client.user.setPresence({
+    status: 'online',
+    activity: {
+      type: 'PLAYING',
+      name: 'with cheese | In developement!',
+    },
+  });
 });
 
 client.commands = new Collection();
@@ -48,8 +58,6 @@ client.on(Events.InteractionCreate, async interaction => {
     }
   }
 });
-
-const { exec } = require('child_process');
 
 exec('node deploy-commands.js', (error) => {
   if (error) {
