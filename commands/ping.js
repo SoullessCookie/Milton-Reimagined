@@ -12,7 +12,6 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setColor('#ffd86e')
       .setTitle('Ping')
-      .setDescription('Latency/API Ping')
       .setThumbnail(guild.iconURL({ dynamic: true }))
       .addFields(
         { name: `Server Latency`, value: `Latency is ${Date.now() - interaction.createdTimestamp}ms.` },

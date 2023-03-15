@@ -7,8 +7,6 @@ module.exports = {
     .setName('server-advanced')
     .setDescription('Provides advanced information about the server.'),
   async execute(interaction) {
-    await interaction.deferReply();
-    await wait(4000);
 
     const { guild } = interaction;
     const { owner } = await interaction.guild.fetchOwner();
@@ -88,6 +86,6 @@ module.exports = {
       .addFields({ name: 'Widget Enabled', value: `${guild.widgetEnabled}`, inline: true },)
       .setTimestamp()
 
-    await interaction.followUp({ embeds: [embed1, embed2, embed3] });
+    await interaction.reply({ embeds: [embed1, embed2, embed3] });
   },
 };

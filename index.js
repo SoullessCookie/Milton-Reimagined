@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Events, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const { token } = require('./config.json');
 const { exec } = require('child_process');
 const { pm2 } = require('pm2');
@@ -9,17 +9,21 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
-client.once(Events.ClientReady, c => {
-  console.log(`Ready! Logged in as ${c.user.tag}`);
+let totalUsers = 0;
+
+client.on('ready', async () => {
+
+  console.log(`Ready! Logged in as ${client.user.tag}`);
+
+  const guildCount = client.guilds.cache.size;
 
   client.user.setPresence({
-    status: 'online',
-    activity: {
-      type: 'PLAYING',
-      name: 'with cheese | In developement!',
-    },
+    activities: [{ name: `${guildCount} Guilds | /help`, type: ActivityType.Watching }],
+    status: 'dnd',
   });
-});
+})
+
+
 
 client.commands = new Collection();
 
@@ -64,6 +68,36 @@ exec('node deploy-commands.js', (error) => {
     console.error(`exec error: ${error}`);
     return;
   }
+});
+
+
+const { MongoClient } = require('mongodb');
+
+// Replace the following with your MongoDB connection string
+const url = 'mongodb+srv://miltondb.at8jg7u.mongodb.net/MiltonDB';
+
+// Connect to the database
+const mongoClient = new MongoClient(url, {
+  auth: {
+    username: "discordbot",
+    password: process.env.mongopass
+  }
+});
+mongoClient.connect();
+
+// Get a reference to the database
+const db = mongoClient.db();
+
+// Insert a document into a collection
+const collection = db.collection('mycollection');
+collection.insertOne({ name: 'John Doe', name: { age: 42 } });
+
+// Find documents in a collection
+const documents = collection.find({ age: { $gt: 30 } }).toArray();
+
+
+client.on('guildCreate', (guild) => {
+  console.log(`Joined ${guild.name} (ID: ${guild.id})`);
 });
 
 client.login(process.env.token);

@@ -7,13 +7,12 @@ module.exports = {
     .setName('server')
     .setDescription('Provides information about the server.'),
   async execute(interaction) {
-    await interaction.deferReply();
-    await wait(4000);
+
 
     const { guild } = interaction;
     const { owner } = await interaction.guild.fetchOwner();
     const embed = new EmbedBuilder()
-      .setColor('BLUE')
+      .setColor(0x0099FF)
       .setTitle(`${guild.name} Server Information`)
       .addFields(
         { name: 'Owner', value: `${guild.ownerId}`, inline: true },
@@ -27,6 +26,6 @@ module.exports = {
       .setThumbnail(guild.iconURL({ dynamic: true }))
       .setTimestamp()
 
-    await interaction.followUp({ embeds: [embed]});
+    await interaction.reply({ embeds: [embed] });
   },
 };
