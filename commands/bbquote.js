@@ -1,4 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
+
 const saul = [
   'Clearly, his taste in women is the same as his taste in lawyers.',
   'You two suck at peddling meth.',
@@ -132,7 +134,17 @@ module.exports = {
         message = 'Invalid option selected.';
     }
 
-    await interaction.reply(message);
+    const embed = new EmbedBuilder()
+      .setColor('#ac6f17')
+      .setTitle(`Breaking Bad Quote`)
+      .addFields({ name: ' ', value: `${message}` })
+      .setTimestamp()
+
+    try {
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+    }
 
   }
 };

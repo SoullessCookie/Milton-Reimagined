@@ -17,6 +17,10 @@ module.exports = {
       .setColor('#FFFF00')
       .setTimestamp();
 
-    await interaction.reply({ embeds: [embed] });
+    try {
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+    }
   },
 };

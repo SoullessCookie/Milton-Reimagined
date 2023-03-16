@@ -86,6 +86,11 @@ module.exports = {
       .addFields({ name: 'Widget Enabled', value: `${guild.widgetEnabled}`, inline: true },)
       .setTimestamp()
 
-    await interaction.reply({ embeds: [embed1, embed2, embed3] });
+
+    try {
+      await interaction.reply({ embeds: [embed1, embed2, embed3] });
+    } catch (error) {
+      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+    }
   },
 };

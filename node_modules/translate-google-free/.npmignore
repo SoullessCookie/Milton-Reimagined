@@ -1,0 +1,13 @@
+.DS_*
+node_modules
+node_modules/*
+*.sublime*
+psd
+thumb
+*.log
+/index.coffee
+/test/
+samples
+build
+*~
+npm-debug.log

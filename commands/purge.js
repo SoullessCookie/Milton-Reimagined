@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
+const wait = require('node:timers/promises').setTimeout;
+
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -10,22 +12,30 @@ module.exports = {
         .setRequired(true)),
 
   async execute(interaction) {
+    await interaction.deferReply();
+    await wait(4000);
     if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_MESSAGES', 'OWNER'])) {
-      return await interaction.reply('You do not have permission to use this command.');
+      return await interaction.editReply('You do not have permission to use this command.');
     }
 
     const purgeAmount = interaction.options.getInteger('amount');
 
     try {
       const messages = await interaction.channel.bulkDelete(purgeAmount);
-      await interaction.reply({ content: `${messages.size} messages were purged.`, ephemeral: true });
+      if (interaction.replied) { // check if original message exists before editing
+        await interaction.editReply({ content: `${messages.size} messages were purged.`, ephemeral: true });
+      }
     } catch (error) {
       if (error.code === 50034) {
-        return message.reply({ content: 'I can only delete messages that are less than 14 days old.', ephemeral: true });
+        if (interaction.replied) { // check if original message exists before editing
+          await interaction.editReply({ content: 'I can only delete messages that are less than 14 days old.', ephemeral: true });
+        }
       } else {
-        console.error(error);
-        return message.reply({ content: 'There was an error trying to delete messages.', ephemeral: true });
+        console.log(error)
+        if (interaction.replied) { // check if original message exists before editing
+          await interaction.editReply({ content: 'There was an error trying to delete messages.', ephemeral: true });
+        }
       }
     }
-  },
+  }
 };

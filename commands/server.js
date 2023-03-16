@@ -26,6 +26,10 @@ module.exports = {
       .setThumbnail(guild.iconURL({ dynamic: true }))
       .setTimestamp()
 
-    await interaction.reply({ embeds: [embed] });
+    try {
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+    }
   },
 };
