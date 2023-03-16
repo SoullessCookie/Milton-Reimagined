@@ -3,8 +3,7 @@
 [![CodeQL](https://github.com/SoullessCookie/Milton-Reimagined/actions/workflows/codeql.yml/badge.svg)](https://github.com/SoullessCookie/Milton-Reimagined/actions/workflows/codeql.yml)
 
 I actually know JavaScript this time (and has help)
-A lot less shit code
-A lot more practicality
+
 
 It's Milton but new.... pretty damn cool
 
