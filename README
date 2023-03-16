@@ -1,6 +1,6 @@
+# I brought Milton back
 
-# Display GitHub Action Badge [![Azure Static Web Apps CI/CD](https://github.com/elbruno/AzureApiBadge/actions/workflows/azure-static-web-apps-victorious-wave-00360790f.yml/badge.svg)](https://github.com/elbruno/AzureApiBadge/actions/workflows/azure-static-web-apps-victorious-wave-00360790f.yml)
-I brought Milton back
+![CodeQL](https://github.com/SoullessCookie/Milton-Reimagined/actions/workflows/codeql.yml/badge.svg)
 
 I actually know JavaScript this time (and has help)
 A lot less shit code
