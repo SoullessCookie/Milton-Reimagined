@@ -7,23 +7,31 @@ const { pm2 } = require('pm2');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-// When the client is ready, run this code (only once)
-// We use 'c' for the event parameter to keep it separate from the already defined 'client'
-let totalUsers = 0;
+const { MongoClient } = require('mongodb');
+
+const uri = `mongodb+srv://milton:${process.env.mongoToken}@discord.o4bbgom.mongodb.net/?retryWrites=true&w=majority`;
+
+const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+async function connectToDatabase() {
+  await mongoClient.connect();
+  return mongoClient.db('discord');
+}
+
+// Load the current counter value from the data file
+let counterData = fs.readFileSync('./data.json');
+let counter = JSON.parse(counterData).counter || 0;
 
 client.on('ready', async () => {
-
   console.log(`Ready! Logged in as ${client.user.tag}`);
 
   const guildCount = client.guilds.cache.size;
 
   client.user.setPresence({
-    activities: [{ name: `${guildCount} Guilds | /help`, type: ActivityType.Watching }],
+    activities: [{ name: `${guildCount} Guilds | ${counter} commands used`, type: ActivityType.Watching }],
     status: 'dnd',
   });
-})
-
-
+});
 
 client.commands = new Collection();
 
@@ -33,7 +41,7 @@ const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
-  // Set a new item in the Collection with the key as the command name and the value as the exported module
+
   if ('data' in command && 'execute' in command) {
     client.commands.set(command.data.name, command);
   } else {
@@ -44,12 +52,22 @@ for (const file of commandFiles) {
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
-  const command = interaction.client.commands.get(interaction.commandName);
+  const command = client.commands.get(interaction.commandName);
+  const db = await connectToDatabase();
+  const servers = await connectToDatabase().then(db => db.collection('servers'));
+  const serverId = interaction.guild.id;
+  const settings = {
+    serverName: `${interaction.guild.name}`,
+  };
+  await servers.updateOne({ _id: serverId }, { $set: settings }, { upsert: true });
 
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`);
     return;
   }
+
+  counter++;
+  fs.writeFileSync('./data.json', JSON.stringify({ counter }));
 
   try {
     await command.execute(interaction);
@@ -61,6 +79,14 @@ client.on(Events.InteractionCreate, async interaction => {
       await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
   }
+
+  // Update the bot's status with the new counter value
+  const guildCount = client.guilds.cache.size;
+
+  client.user.setPresence({
+    activities: [{ name: `${guildCount} Guilds | ${counter} Commands used`, type: ActivityType.Watching }],
+    status: 'dnd',
+  });
 });
 
 exec('node deploy-commands.js', (error) => {
@@ -70,34 +96,29 @@ exec('node deploy-commands.js', (error) => {
   }
 });
 
+client.on('guildMemberAdd', async (member) => {
+  // Retrieve the server settings from the database
+  const serverSettings = await servers.findOne({ _id: member.guild.id });
 
-const { MongoClient } = require('mongodb');
+  // Check if welcome command is enabled for the server
+  if (!serverSettings || !serverSettings.welcomeCommand) return;
 
-// Replace the following with your MongoDB connection string
-const url = 'mongodb+srv://miltondb.at8jg7u.mongodb.net/MiltonDB';
+  // Get the ID of the welcome channel
+  const channelId = serverSettings.welcomeChannel;
 
-// Connect to the database
-const mongoClient = new MongoClient(url, {
-  auth: {
-    username: "discordbot",
-    password: process.env.mongopass
-  }
+  // Find the welcome channel by ID in the server
+  const channel = member.guild.channels.cache.get(channelId);
+
+  // Check if the welcome channel exists
+  if (!channel) return;
+
+  // Get the welcome message from the server settings and replace the user placeholder with the user's name
+  const welcomeMessage = serverSettings.welcomeMessage.replace('{user}', `<@${member.id}>`);
+
+  // Send the welcome message to the welcome channel
+  channel.send(welcomeMessage);
+  console.log(welcomeMessage);
 });
-mongoClient.connect();
 
-// Get a reference to the database
-const db = mongoClient.db();
-
-// Insert a document into a collection
-const collection = db.collection('mycollection');
-collection.insertOne({ name: 'John Doe', name: { age: 42 } });
-
-// Find documents in a collection
-const documents = collection.find({ age: { $gt: 30 } }).toArray();
-
-
-client.on('guildCreate', (guild) => {
-  console.log(`Joined ${guild.name} (ID: ${guild.id})`);
-});
 
 client.login(process.env.token);

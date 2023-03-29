@@ -29,7 +29,6 @@ module.exports = {
       .addFields({ name: 'Guild Description', value: `${guild.description}`, inline: true },)
       .addFields({ name: 'Discovery Splash', value: `${guild.discoverySplash}`, inline: true },)
       .addFields({ name: 'Explicit Filter Level', value: `${guild.explicitContentFilter}`, inline: true },)
-      .addFields({ name: 'Features', value: `${guild.features}`, inline: true },)
       .addFields({ name: 'Icon', value: `${guild.icon}`, inline: true },)
       .addFields({ name: 'Guild ID', value: `${guild.id}`, inline: true },)
       .addFields({ name: 'Invites', value: `${guild.invites}`, inline: true },)
