@@ -14,7 +14,7 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply();
     await wait(500);
-    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_MESSAGES', 'OWNER'])) {
+    if (!interaction.member.permissions.has(['MANAGE_MESSAGES'])) {
       return await interaction.editReply('You do not have permission to use this command.');
     }
 

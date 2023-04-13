@@ -121,4 +121,50 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 
+client.on('voiceStateUpdate', async (oldState, newState) => {
+  const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try {
+    await dbClient.connect();
+    const db = dbClient.db('discord');
+    const servers = db.collection('servers');
+
+    const server = await servers.findOne({ _id: newState.guild.id });
+    if (!server || !server.customVoice || !server.customVoiceChannel) {
+      return;
+    }
+
+    const customVoiceChannel = newState.guild.channels.cache.get(server.customVoiceChannel);
+    if (newState.channel?.id === customVoiceChannel.id) {
+      const memberCount = newState.channel.members.size;
+
+      if (memberCount === 1) {
+        const channelName = `${newState.member.displayName}'s Channel`;
+        const newChannel = await newState.guild.channels.create(channelName, {
+          type: 'GUILD_VOICE',
+          parent: customVoiceChannel.parent,
+          permissionOverwrites: [
+            {
+              id: newState.member.id,
+              allow: ['MANAGE_CHANNELS', 'MANAGE_ROLES', 'CONNECT', 'SPEAK'],
+            },
+            {
+              id: newState.guild.roles.everyone.id,
+              deny: ['CONNECT', 'SPEAK'],
+            },
+          ],
+        });
+
+        await newState.setChannel(newChannel);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    // Close the connection to the MongoDB cluster
+    await dbClient.close();
+  }
+});
+
+
 client.login(process.env.token);
