@@ -5,4 +5,4 @@
     pkgs.yarn
     pkgs.replitPackages.jest
 	];
-} 
+}
