@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
-
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -22,18 +22,33 @@ module.exports = {
 
     try {
       const messages = await interaction.channel.bulkDelete(purgeAmount);
+      const embed = new EmbedBuilder()
+        .setColor('#52FF33')
+        .setTitle(`Purged ${messages.size} messages`)
+        .setDescription(`Deleted ${messages.size} messages from this channel.`)
+        .setTimestamp();
       if (interaction.replied) { // check if original message exists before editing
-        await interaction.editReply({ content: `${messages.size} messages were purged.`, ephemeral: true });
+        await interaction.editReply({ embeds: [embed], ephemeral: true });
       }
     } catch (error) {
       if (error.code === 50034) {
+        const embed = new EmbedBuilder()
+          .setColor('#FF3333')
+          .setTitle('Error')
+          .setDescription('I can only delete messages that are less than 14 days old.')
+          .setTimestamp();
         if (interaction.replied) { // check if original message exists before editing
-          await interaction.editReply({ content: 'I can only delete messages that are less than 14 days old.', ephemeral: true });
+          await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       } else {
         console.log(error)
+        const embed = new EmbedBuilder()
+          .setColor('#FF3333')
+          .setTitle('Error')
+          .setDescription('There was an error trying to delete messages.')
+          .setTimestamp();
         if (interaction.replied) { // check if original message exists before editing
-          await interaction.editReply({ content: 'There was an error trying to delete messages.', ephemeral: true });
+          await interaction.editReply({ embeds: [embed], ephemeral: true });
         }
       }
     }
