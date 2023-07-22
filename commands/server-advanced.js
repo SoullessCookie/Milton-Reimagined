@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 
+// I am not adding comments describing everything in here.... i'm sorry, but hell no
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('server-advanced')

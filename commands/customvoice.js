@@ -14,7 +14,9 @@ module.exports = {
       option.setName('channel')
         .setDescription('Select the channel where custom voice channels will be created.')
         .setRequired(true)),
+
   async execute(interaction) {
+    // Create a new MongoDB client
     const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
       // Connect to the MongoDB cluster
@@ -22,20 +24,23 @@ module.exports = {
       const db = dbClient.db('discord');
       const servers = db.collection('servers');
 
-      // Check if user has permission to use the command
+      // Check if the user has permission to use the command
       if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_GUILD', 'OWNER'])) {
         return await interaction.reply('You do not have permission to use this command.');
       }
 
+      // Get the switch and channel options from the command
       const customVoice = interaction.options.getBoolean('switch');
       const customVoiceChannel = interaction.options.getChannel('channel');
 
+      // Update the server document in the MongoDB collection
       await servers.updateOne(
         { _id: interaction.guildId },
         { $set: { customVoice, customVoiceChannel: customVoiceChannel.id } },
         { upsert: true }
       );
 
+      // Create an embed to display the updated settings
       const { guild } = interaction;
       const embed = new EmbedBuilder()
         .setColor(0x26eebf)
@@ -45,8 +50,9 @@ module.exports = {
           { name: 'Channel', value: `${customVoiceChannel}`, inline: true },
         )
         .setThumbnail(guild.iconURL({ dynamic: true }))
-        .setTimestamp()
+        .setTimestamp();
 
+      // Reply with the embed showing the updated settings
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
       console.log(error);

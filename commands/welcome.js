@@ -1,7 +1,10 @@
 const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const { MongoClient } = require('mongodb');
 
+// Create a new Discord.js client with specific intents
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+// MongoDB connection URI, which includes the username and password
 const uri = `mongodb+srv://milton:${process.env.mongoToken}@discord.o4bbgom.mongodb.net/?retryWrites=true&w=majority`;
 
 module.exports = {
@@ -21,6 +24,7 @@ module.exports = {
         .setDescription('Channel to send welcome messages in')
         .setRequired(true)),
   async execute(interaction) {
+    // Create a new MongoDB client
     const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
     try {
@@ -34,11 +38,13 @@ module.exports = {
         return await interaction.reply('You do not have permission to use this command.');
       }
 
+      // Get the new welcome message, switch status, and channel from the command options
       const welcomeMessage = interaction.options.getString('message');
       const welcomeCommand = interaction.options.getBoolean('switch');
       const welcomeChannel = interaction.options.getString('channel');
       const serverId = interaction.guild.id;
 
+      // Update or insert the welcome message settings for the specific server in the MongoDB collection
       await servers.updateOne(
         { _id: serverId },
         { $set: { welcomeCommand } },
@@ -54,6 +60,8 @@ module.exports = {
         { $set: { welcomeChannel } },
         { upsert: true }
       );
+
+      // Create an embed to display the updated welcome message settings
       const { guild } = interaction;
       const embed = new EmbedBuilder()
         .setColor(0x26eebf)
@@ -64,8 +72,9 @@ module.exports = {
           { name: 'Message', value: `${welcomeMessage}`, inline: true },
         )
         .setThumbnail(guild.iconURL({ dynamic: true }))
-        .setTimestamp()
+        .setTimestamp();
 
+      // Reply to the interaction with the updated welcome message settings
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
       console.log(error);

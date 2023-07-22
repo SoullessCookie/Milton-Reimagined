@@ -5,7 +5,9 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('help')
     .setDescription('Provides help information'),
+
   async execute(interaction) {
+    // Create an embed with the list of available commands and their descriptions
     const embed = new EmbedBuilder()
       .setTitle('List of available commands:')
       .addFields(
@@ -18,8 +20,10 @@ module.exports = {
       .setTimestamp();
 
     try {
+      // Reply with the embed containing the command information
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
+      // If an error occurs, reply with an error message
       await interaction.reply({ content: 'An error occurred', ephemeral: true });
     }
   },

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 
+// Import the `setTimeout` function from the Node.js built-in `timers/promises` module
 const wait = require('node:timers/promises').setTimeout;
 
 module.exports = {
@@ -9,6 +10,7 @@ module.exports = {
     .setDescription('About the author/developers'),
   async execute(interaction) {
 
+    // Create an embed to display information about the author/developers
     const embed = new EmbedBuilder()
       .setColor('#ddff57')
       .setTitle('About the Author')
@@ -23,6 +25,7 @@ module.exports = {
       .setThumbnail('https://imgur.com/KthB9H3')
       .setTimestamp();
 
+    // Send the embed as a reply to the user who invoked the command
     await interaction.reply({ embeds: [embed] });
   },
 };

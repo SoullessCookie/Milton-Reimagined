@@ -6,11 +6,12 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('server')
     .setDescription('Provides information about the server.'),
+
   async execute(interaction) {
-
-
     const { guild } = interaction;
     const { owner } = await interaction.guild.fetchOwner();
+
+    // Create an embed with basic server information
     const embed = new EmbedBuilder()
       .setColor(0x0099FF)
       .setTitle(`${guild.name} Server Information`)
@@ -27,8 +28,10 @@ module.exports = {
       .setTimestamp()
 
     try {
+      // Reply to the interaction with the embed containing server information
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
+      // If there's an error during the execution, send an error message
       await interaction.reply({ content: 'An error occurred', ephemeral: true });
     }
   },

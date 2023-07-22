@@ -7,10 +7,12 @@ module.exports = {
     .setDescription('Checks for unassigned roles and blank roles.'),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(['OWNER'])) {
+    // Check if the user invoking the command is the server owner
+    if (!interaction.member.permissions.has('OWNER')) {
       return await interaction.reply('You do not have permission to use this command.');
     }
 
+    // Create buttons for different actions: delete unassigned, delete blank, delete both, delete none
     const unassigned = new ButtonBuilder()
       .setCustomId('unassigned')
       .setLabel('Delete Unassigned')
@@ -31,32 +33,27 @@ module.exports = {
       .setLabel('Delete None')
       .setStyle(ButtonStyle.Success);
 
+    // Create an action row to contain the buttons
     const row = new ActionRowBuilder()
       .addComponents(unassigned, blank, both, none);
 
+    // Define a filter to only allow the interaction from the original user
     const collectorFilter = i => i.user.id === interaction.user.id;
 
     try {
+      // Get all roles from the server's role cache
       const guildRoles = interaction.guild.roles.cache;
 
-      // Delay to allow Discord to update the cache
+      // Delay to allow Discord to update the cache (optional, for role cache accuracy)
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      const unassignedRoles = guildRoles.filter(
-        role => role.members.size === 0 && role.id !== interaction.guild.id
-      );
+      // Filter roles that are unassigned (no members) and roles that are blank (name: @everyone, no permissions)
+      const unassignedRoles = guildRoles.filter(role => role.members.size === 0 && role.id !== interaction.guild.id);
+      const blankRoles = guildRoles.filter(role => role.permissions.bitfield === 0 && role.name.toLowerCase() === '@everyone');
 
-      const blankRoles = guildRoles.filter(
-        role => role.permissions.bitfield === 0 && role.name.toLowerCase() === '@everyone'
-      );
-
-      const newRoles = guildRoles.filter(
-        role => role.name.toLowerCase() === 'new role' && role.permissions.bitfield === 0
-      );
-
+      // Create response messages based on the filtered roles
       let unassignedResponse = 'There are no unassigned roles in this server.';
       let blankResponse = 'There are no blank roles in this server.';
-      let newRolesResponse = 'There are no roles named "New Role" with default permissions in this server.';
 
       if (unassignedRoles.size > 0) {
         let roleList = '';
@@ -76,6 +73,7 @@ module.exports = {
         blankResponse = `Blank roles: ${roleList}`;
       }
 
+      // Create an embed with the role cleanup information
       const embed = new EmbedBuilder()
         .setColor('#0099FF')
         .setTitle(`Role Cleanup for ${interaction.guild.name}`)
@@ -83,6 +81,7 @@ module.exports = {
         .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
         .setTimestamp();
 
+      // Send the interaction response with the embed and action row containing buttons
       const response = await interaction.reply({
         content: 'Role cleanup:',
         embeds: [embed],
@@ -90,8 +89,10 @@ module.exports = {
         ephemeral: true,
       });
 
+      // Await a message component interaction (button click) from the original user with a 60-second timeout
       const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
 
+      // Handle different button clicks based on the customId of the clicked button
       if (confirmation.customId === 'unassigned') {
         // Delete unassigned roles
         for (const role of unassignedRoles.values()) {
@@ -119,7 +120,8 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-      //await interaction.reply({ content: 'An error occurred while trying to retrieve roles.', ephemeral: true });
+      // Handle any error that occurred during role cleanup (optional)
+      await interaction.reply({ content: 'An error occurred while trying to retrieve roles.', ephemeral: true });
     }
   },
 };

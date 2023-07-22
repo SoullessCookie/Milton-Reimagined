@@ -15,17 +15,23 @@ module.exports = {
         .setRequired(false)),
 
   async execute(interaction) {
-    if (!interaction.member.permissions.has(['ADMINISTRATOR *', 'BAN_MEMBERS *', 'OWNER'])) {
+    // Check if the user invoking the command has the necessary permissions
+    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'BAN_MEMBERS', 'OWNER'])) {
       return await interaction.reply('You do not have permission to use this command.');
     }
 
+    // Get the user to ban and the reason for the ban from the command options
     const userToBan = interaction.options.getUser('user');
     const banReason = interaction.options.getString('reason');
 
     try {
-      await interaction.guild.members.ban(userToBan, { reason: `Banned by ${interaction.user.tag} for ${banReason}` });
-      await interaction.reply(`${userToBan} has been banned.`);
+      // Ban the user with the specified reason
+      await interaction.guild.members.ban(userToBan, { reason: `Banned by ${interaction.user.tag} for ${banReason || 'no reason provided'}` });
+
+      // Send a confirmation message indicating that the user has been banned
+      await interaction.reply(`${userToBan.tag} has been banned.`);
     } catch (error) {
+      // If an error occurs during the ban process, reply with an error message
       await interaction.reply({ content: 'An error occurred while trying to ban the user.', ephemeral: true });
     }
   },
