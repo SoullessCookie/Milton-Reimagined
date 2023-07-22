@@ -307,6 +307,16 @@ class Guild extends AnonymousGuild {
       this.maxVideoChannelUsers ??= null;
     }
 
+    if ('max_stage_video_channel_users' in data) {
+      /**
+       * The maximum amount of users allowed in a stage video channel.
+       * @type {?number}
+       */
+      this.maxStageVideoChannelUsers = data.max_stage_video_channel_users;
+    } else {
+      this.maxStageVideoChannelUsers ??= null;
+    }
+
     if ('approximate_member_count' in data) {
       /**
        * The approximate amount of members the guild has
@@ -358,6 +368,16 @@ class Guild extends AnonymousGuild {
        * @type {Locale}
        */
       this.preferredLocale = data.preferred_locale;
+    }
+
+    if ('safety_alerts_channel_id' in data) {
+      /**
+       * The safety alerts channel's id for the guild
+       * @type {?Snowflake}
+       */
+      this.safetyAlertsChannelId = data.safety_alerts_channel_id;
+    } else {
+      this.safetyAlertsChannelId ??= null;
     }
 
     if (data.channels) {
@@ -525,6 +545,15 @@ class Guild extends AnonymousGuild {
   }
 
   /**
+   * Safety alerts channel for this guild
+   * @type {?TextChannel}
+   * @readonly
+   */
+  get safetyAlertsChannel() {
+    return this.client.channels.resolve(this.safetyAlertsChannelId);
+  }
+
+  /**
    * The maximum bitrate available for this guild
    * @type {number}
    * @readonly
@@ -623,9 +652,6 @@ class Guild extends AnonymousGuild {
    *   .catch(console.error);
    */
   async fetchVanityData() {
-    if (!this.features.includes(GuildFeature.VanityURL)) {
-      throw new DiscordjsError(ErrorCodes.VanityURL);
-    }
     const data = await this.client.rest.get(Routes.guildVanityUrl(this.id));
     this.vanityURLCode = data.code;
     this.vanityURLUses = data.uses;
@@ -753,6 +779,7 @@ class Guild extends AnonymousGuild {
    * @property {SystemChannelFlagsResolvable} [systemChannelFlags] The system channel flags of the guild
    * @property {?TextChannelResolvable} [rulesChannel] The rules channel of the guild
    * @property {?TextChannelResolvable} [publicUpdatesChannel] The community updates channel of the guild
+   * @property {?TextChannelResolvable} [safetyAlertsChannel] The safety alerts channel of the guild
    * @property {?string} [preferredLocale] The preferred locale of the guild
    * @property {GuildFeature[]} [features] The features of the guild
    * @property {?string} [description] The discovery description of the guild
@@ -803,6 +830,7 @@ class Guild extends AnonymousGuild {
     publicUpdatesChannel,
     preferredLocale,
     premiumProgressBarEnabled,
+    safetyAlertsChannel,
     ...options
   }) {
     const data = await this.client.rest.patch(Routes.guild(this.id), {
@@ -825,6 +853,7 @@ class Guild extends AnonymousGuild {
         public_updates_channel_id: publicUpdatesChannel && this.client.channels.resolveId(publicUpdatesChannel),
         preferred_locale: preferredLocale,
         premium_progress_bar_enabled: premiumProgressBarEnabled,
+        safety_alerts_channel_id: safetyAlertsChannel && this.client.channels.resolveId(safetyAlertsChannel),
       },
       reason: options.reason,
     });
@@ -1139,6 +1168,21 @@ class Guild extends AnonymousGuild {
   }
 
   /**
+   * Edits the safety alerts channel of the guild.
+   * @param {?TextChannelResolvable} safetyAlertsChannel The new safety alerts channel
+   * @param {string} [reason] Reason for changing the guild's safety alerts channel
+   * @returns {Promise<Guild>}
+   * @example
+   * // Edit the guild safety alerts channel
+   * guild.setSafetyAlertsChannel(channel)
+   *  .then(updated => console.log(`Updated guild safety alerts channel to ${updated.safetyAlertsChannel.name}`))
+   *  .catch(console.error);
+   */
+  setSafetyAlertsChannel(safetyAlertsChannel, reason) {
+    return this.edit({ safetyAlertsChannel, reason });
+  }
+
+  /**
    * Edits the guild's widget settings.
    * @param {GuildWidgetSettingsData} settings The widget settings for the guild
    * @param {string} [reason] Reason for changing the guild's widget settings
@@ -1157,9 +1201,15 @@ class Guild extends AnonymousGuild {
 
   /**
    * Sets the guild's MFA level
+   * <info>An elevated MFA level requires guild moderators to have 2FA enabled.</info>
    * @param {GuildMFALevel} level The MFA level
    * @param {string} [reason] Reason for changing the guild's MFA level
    * @returns {Promise<Guild>}
+   * @example
+   * // Set the MFA level of the guild to Elevated
+   * guild.setMFALevel(GuildMFALevel.Elevated)
+   *   .then(guild => console.log("Set guild's MFA level to Elevated"))
+   *   .catch(console.error);
    */
   async setMFALevel(level, reason) {
     await this.client.rest.post(Routes.guildMFA(this.id), {
@@ -1177,7 +1227,7 @@ class Guild extends AnonymousGuild {
    * @example
    * // Leave a guild
    * guild.leave()
-   *   .then(g => console.log(`Left the guild ${g}`))
+   *   .then(guild => console.log(`Left the guild: ${guild.name}`))
    *   .catch(console.error);
    */
   async leave() {

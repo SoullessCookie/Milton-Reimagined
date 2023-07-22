@@ -5,7 +5,7 @@ const { token } = require('./config.json');
 const { exec } = require('child_process');
 const { pm2 } = require('pm2');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildModeration, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildInvites, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.AutoModerationConfiguration, GatewayIntentBits.AutoModerationExecution] });
 
 const { MongoClient } = require('mongodb');
 
@@ -17,6 +17,8 @@ async function connectToDatabase() {
   await mongoClient.connect();
   return mongoClient.db('discord');
 }
+
+
 
 // Load the current counter value from the data file
 let counterData = fs.readFileSync('./data.json');
@@ -165,6 +167,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     await dbClient.close();
   }
 });
+
 
 
 client.login(process.env.token);
