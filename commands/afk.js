@@ -80,7 +80,7 @@ module.exports = {
         // Remove the user from the AFK Map when their status is removed
         afkUsers.delete(user.id);
 
-        // Send a reply to the user welcoming them back and informing them that their AFK mode is removed
+        // Send a reply to the user welcoming them back and informing them their AFK mode is removed
         await interaction.followUp({ content: `Welcome back, ${user.username}! Your AFK mode has been removed.`, ephemeral: true });
       });
     });
