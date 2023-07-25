@@ -32,9 +32,11 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      // If an error occurs during the nuke process, reply with an error message
-      console.log(error);
-      await interaction.reply({ content: 'An error occurred while trying to nuke the channel.', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

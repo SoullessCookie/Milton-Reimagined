@@ -46,7 +46,11 @@ module.exports = {
         await interaction.member.roles.add(newRole);
         await interaction.reply({ embeds: [embed] });
       } catch (error) {
-        await interaction.reply({ content: 'An error occurred', ephemeral: true });
+        const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+        if (logChannel) {
+          logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+        }
+        await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
       }
     }
   },

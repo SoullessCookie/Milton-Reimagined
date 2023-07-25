@@ -16,8 +16,11 @@ module.exports = {
       // Reply with a message containing the user's username and the time they joined the guild
       await interaction.reply(`This command was run by ${username}, who joined on ${joinedAt}.`);
     } catch (error) {
-      // If there's an error during the execution, reply with an error message
-      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get('1133160906361147517');
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

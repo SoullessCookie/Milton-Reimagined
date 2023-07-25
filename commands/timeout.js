@@ -50,9 +50,11 @@ module.exports = {
       // Reply to the interaction with a success message
       await interaction.reply(`${userToTimeout.tag} has been timed out.`);
     } catch (error) {
-      console.log(error);
-      // If there's an error during the execution, send an error message
-      await interaction.reply('An error occurred while trying to time out the user.');
+      const logChannel = interaction.client.channels.cache.get('1133160906361147517');
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

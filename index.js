@@ -168,6 +168,23 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
   }
 });
 
+async function logError(errorMessage, command, user, time) {
+  const logChannelId = '1133160906361147517';
+  const logChannel = client.channels.cache.get(logChannelId);
+  const devId = '963991093219840000';
+
+  if (logChannel) {
+    const mention = `<@${devId}>`;
+    const logMessage = `${mention}\nError occurred in command: ${command}\nUser: ${user}\nTime: ${time}\nError Message: ${errorMessage}`;
+    await logChannel.send(logMessage);
+  } else {
+    console.log("Error...");
+  }
+}
+
+module.exports = {
+  logError,
+};
 
 
 client.login(process.env.token);

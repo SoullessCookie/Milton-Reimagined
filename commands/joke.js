@@ -23,8 +23,11 @@ module.exports = {
       // Reply to the user with the joke embedded
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      // If an error occurs, reply with an error message
-      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

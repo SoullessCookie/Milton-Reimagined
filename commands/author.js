@@ -25,7 +25,15 @@ module.exports = {
       .setThumbnail('https://imgur.com/KthB9H3')
       .setTimestamp();
 
-    // Send the embed as a reply to the user who invoked the command
-    await interaction.reply({ embeds: [embed] });
+    try {
+      // Send the embed as a reply to the user who invoked the command
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
+    }
   },
 };

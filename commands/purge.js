@@ -67,6 +67,11 @@ module.exports = {
         // Check if the original message still exists before editing the reply
         if (interaction.replied) {
           await interaction.editReply({ embeds: [embed], ephemeral: true });
+
+          const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+          if (logChannel) {
+            logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+          }
         }
       }
     }

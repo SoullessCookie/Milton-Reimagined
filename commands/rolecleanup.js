@@ -119,9 +119,11 @@ module.exports = {
         await confirmation.update({ content: 'No roles were deleted.', components: [] });
       }
     } catch (error) {
-      console.log(error);
-      // Handle any error that occurred during role cleanup (optional)
-      await interaction.reply({ content: 'An error occurred while trying to retrieve roles.', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

@@ -29,8 +29,11 @@ module.exports = {
       await interaction.guild.members.kick(userToKick, { reason: `Kicked by ${interaction.user.tag} for ${kickReason}` });
       await interaction.reply(`${userToKick} has been kicked.`);
     } catch (error) {
-      // If an error occurs during the kick process, reply with an error message
-      await interaction.reply({ content: 'An error occurred while trying to kick the user.', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

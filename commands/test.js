@@ -10,9 +10,13 @@ module.exports = {
   async execute(interaction) {
 
     try {
-      await interaction.reply(``);
+      await interaction.reply(`test`);
     } catch (error) {
-      await interaction.reply({ content: 'An error occurred while trying to use this command.', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

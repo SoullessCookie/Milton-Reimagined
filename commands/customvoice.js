@@ -55,8 +55,11 @@ module.exports = {
       // Reply with the embed showing the updated settings
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      console.log(error);
-      await interaction.reply({ content: 'An error occurred while trying to switch custom voice channel', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     } finally {
       // Close the connection to the MongoDB cluster
       await dbClient.close();

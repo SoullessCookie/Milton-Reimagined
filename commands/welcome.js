@@ -77,8 +77,11 @@ module.exports = {
       // Reply to the interaction with the updated welcome message settings
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      console.log(error);
-      await interaction.reply({ content: 'An error occurred while trying to switch welcome message', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get('1133160906361147517');
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     } finally {
       // Close the connection to the MongoDB cluster
       await dbClient.close();

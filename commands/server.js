@@ -31,8 +31,11 @@ module.exports = {
       // Reply to the interaction with the embed containing server information
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
-      // If there's an error during the execution, send an error message
-      await interaction.reply({ content: 'An error occurred', ephemeral: true });
+      const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };

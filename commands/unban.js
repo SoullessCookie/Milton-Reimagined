@@ -30,8 +30,11 @@ module.exports = {
       // If successful, reply with a success message indicating that the user has been unbanned
       await interaction.reply(`${userToUnban.tag} has been unbanned.`);
     } catch (error) {
-      // If there's an error during the execution (e.g., user not found, or user not banned), reply with an error message
-      await interaction.reply('An error occurred while trying to unban the user.');
+      const logChannel = interaction.client.channels.cache.get('1133160906361147517');
+      if (logChannel) {
+        logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
   },
 };
