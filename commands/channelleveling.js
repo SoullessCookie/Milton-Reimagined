@@ -41,7 +41,6 @@ module.exports = {
 
 
       if (switchStatus) {
-        // If the user wants to enable experience earning in this channel
         if (index !== -1) {
           // Remove the channel ID from the disabledChannelsLeveling array
           disabledChannelsLeveling.splice(index, 1);

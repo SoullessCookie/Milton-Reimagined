@@ -186,5 +186,4 @@ module.exports = {
   logError,
 };
 
-
 client.login(process.env.token);
