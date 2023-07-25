@@ -147,7 +147,7 @@ module.exports = {
       if (logChannel) {
         logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
       }
-      await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
+      await interaction.reply({ content: 'An error occurred while trying to execute this command :)', ephemeral: true });
     }
   },
 
