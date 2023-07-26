@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Collection, ActivityType, AutoModerationRule } = require('discord.js');
 const { token } = require('./config.json');
 const { exec } = require('child_process');
 const { pm2 } = require('pm2');
@@ -18,23 +18,6 @@ async function connectToDatabase() {
   return mongoClient.db('discord');
 }
 
-
-
-// Load the current counter value from the data file
-let counterData = fs.readFileSync('./data.json');
-let counter = JSON.parse(counterData).counter || 0;
-
-client.on('ready', async () => {
-  console.log(`Ready! Logged in as ${client.user.tag}`);
-
-  const guildCount = client.guilds.cache.size;
-
-  client.user.setPresence({
-    activities: [{ name: `${guildCount} Guilds | ${counter} commands used`, type: ActivityType.Watching }],
-    status: 'dnd',
-  });
-});
-
 client.commands = new Collection();
 
 const commandsPath = path.join(__dirname, 'commands');
@@ -51,45 +34,18 @@ for (const file of commandFiles) {
   }
 }
 
-client.on(Events.InteractionCreate, async interaction => {
-  if (!interaction.isChatInputCommand()) return;
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-  const command = client.commands.get(interaction.commandName);
-  const db = await connectToDatabase();
-  const servers = await connectToDatabase().then(db => db.collection('servers'));
-  const serverId = interaction.guild.id;
-  const settings = {
-    serverName: `${interaction.guild.name}`,
-  };
-  await servers.updateOne({ _id: serverId }, { $set: settings }, { upsert: true });
-
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
+for (const file of eventFiles) {
+  const filePath = path.join(eventsPath, file);
+  const event = require(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
   }
-
-  counter++;
-  fs.writeFileSync('./data.json', JSON.stringify({ counter }));
-
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-    } else {
-      await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-    }
-  }
-
-  // Update the bot's status with the new counter value
-  const guildCount = client.guilds.cache.size;
-
-  client.user.setPresence({
-    activities: [{ name: `${guildCount} Guilds | ${counter} Commands used`, type: ActivityType.Watching }],
-    status: 'dnd',
-  });
-});
+}
 
 exec('node deploy-commands.js', (error) => {
   if (error) {
@@ -167,23 +123,5 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     await dbClient.close();
   }
 });
-
-async function logError(errorMessage, command, user, time) {
-  const logChannelId = '1133160906361147517';
-  const logChannel = client.channels.cache.get(logChannelId);
-  const devId = '963991093219840000';
-
-  if (logChannel) {
-    const mention = `<@${devId}>`;
-    const logMessage = `${mention}\nError occurred in command: ${command}\nUser: ${user}\nTime: ${time}\nError Message: ${errorMessage}`;
-    await logChannel.send(logMessage);
-  } else {
-    console.log("Error...");
-  }
-}
-
-module.exports = {
-  logError,
-};
 
 client.login(process.env.token);

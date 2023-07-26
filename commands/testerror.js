@@ -19,6 +19,7 @@ module.exports = {
       const logChannel = interaction.client.channels.cache.get('1133160906361147517');
       if (logChannel) {
         logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+        client.emit()
       }
       await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
     }
