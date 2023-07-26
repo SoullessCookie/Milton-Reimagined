@@ -40,6 +40,11 @@ module.exports = {
     // Draw a rectangle with the dimensions of the entire canvas
     context.strokeRect(0, 0, canvas.width, canvas.height);
 
+    // Slightly smaller text placed above the member's display name
+    context.font = '28px sans-serif';
+    context.fillStyle = '#ffffff';
+    context.fillText('Profile', canvas.width / 2.5, canvas.height / 3.5);
+
     // Add an exclamation point here and below
     context.font = applyText(canvas, `${user.username}!`);
     context.fillStyle = '#ffffff';
@@ -48,6 +53,15 @@ module.exports = {
     // Assign the decided font to the canvas
     context.font = applyText(canvas, user.username);
     context.fillStyle = '#ffffff';
+    context.fillText(user.username, canvas.width / 2.5, canvas.height / 1.8);
+
+    // Select the font size and type from one of the natively available fonts
+    context.font = '60px sans-serif';
+
+    // Select the style that will be used to fill the text in
+    context.fillStyle = '#ffffff';
+
+    // Actually fill the text with a solid color
     context.fillText(user.username, canvas.width / 2.5, canvas.height / 1.8);
 
     // Pick up the pen
@@ -72,16 +86,6 @@ module.exports = {
 
       // Draw a shape onto the main canvas
       context.drawImage(avatar, 25, 25, 200, 200);
-
-      // Retrieve user's level and balance from your data source (e.g., database)
-      const userLevel = 10 //await getUserLevel(user.id);
-      const userBalance = 10 //await getUserBalance(user.id);
-
-      // Add user's level and balance text underneath the name
-      context.font = '20px Arial'; // Use a nicer font here
-      context.fillStyle = '#ffffff';
-      context.fillText(`Level: ${userLevel}`, canvas.width / 2.5, canvas.height / 1.5);
-      context.fillText(`Balance: ${userBalance}`, canvas.width / 2.5, canvas.height / 1.3);
 
       // Use the helpful Attachment class structure to process the file for you
       const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'profile-image.png' });
