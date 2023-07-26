@@ -10,7 +10,6 @@ const triggerTypeNames = {
 
 module.exports = {
   name: Events.AutoModerationRuleCreate,
-  once: true,
   async execute(autoModerationRule) {
     // Get the relevant data from the AutoModerationRule object
     const guildId = autoModerationRule.guild.id;

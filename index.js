@@ -54,30 +54,6 @@ exec('node deploy-commands.js', (error) => {
   }
 });
 
-client.on('guildMemberAdd', async (member) => {
-  // Retrieve the server settings from the database
-  const serverSettings = await servers.findOne({ _id: member.guild.id });
-
-  // Check if welcome command is enabled for the server
-  if (!serverSettings || !serverSettings.welcomeCommand) return;
-
-  // Get the ID of the welcome channel
-  const channelId = serverSettings.welcomeChannel;
-
-  // Find the welcome channel by ID in the server
-  const channel = member.guild.channels.cache.get(channelId);
-
-  // Check if the welcome channel exists
-  if (!channel) return;
-
-  // Get the welcome message from the server settings and replace the user placeholder with the user's name
-  const welcomeMessage = serverSettings.welcomeMessage.replace('{user}', `<@${member.id}>`);
-
-  // Send the welcome message to the welcome channel
-  channel.send(welcomeMessage);
-  console.log(welcomeMessage);
-});
-
 
 client.on('voiceStateUpdate', async (oldState, newState) => {
   const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
