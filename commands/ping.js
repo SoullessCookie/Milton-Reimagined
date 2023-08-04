@@ -18,7 +18,7 @@ module.exports = {
       .addFields(
         { name: `Server Latency`, value: `Latency is ${Date.now() - interaction.createdTimestamp}ms.` }, // Calculate the server latency
         { name: '\u200B', value: '\u200B' }, // Empty field for spacing
-        { name: `API Latency`, value: `Client ping is ${Math.round(client.ws.ping)}ms.` }, // Display the client's ping to the API
+        { name: `API Latency`, value: `Latency is ${Math.round(client.ws.ping)}ms.` }, // Display the client's ping to the API
       )
       .setTimestamp(); // Set the timestamp to the current time
 
