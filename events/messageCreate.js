@@ -1,6 +1,6 @@
-const { Client, Events, GatewayIntentBits, Collection, ActivityType, EmbedBuilder } = require('discord.js');
+const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildModeration, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildInvites, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildModeration, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.AutoModerationConfiguration, GatewayIntentBits.AutoModerationExecution] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] });
 
 const uri = `mongodb+srv://milton:${process.env.mongoToken}@discord.o4bbgom.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -11,13 +11,14 @@ async function connectToDatabase() {
   return mongoClient.db('discord');
 }
 
+const userCooldowns = {}; // This object will store user cooldown timestamps
+
 module.exports = {
   name: Events.MessageCreate,
   async execute(message) {
     if (message.author.bot) return; // Ignore messages from bots
 
     const userId = message.author.id;
-    const userJoinAt = message.author.joinedAt
     const serverId = message.guild.id;
     const channelId = message.channel.id;
 
@@ -44,40 +45,54 @@ module.exports = {
         return;
       }
 
-      // Find the user in the server's user array
-      const userIndex = server?.users?.findIndex((user) => user._user === userId);
+      // Check if the user is on cooldown
+      const now = Date.now();
+      if (!userCooldowns[userId] || now - userCooldowns[userId] >= 60000) { // 60000 milliseconds = 1 minute
+        // Calculate the random XP earned per message
+        const minXPPerMessage = 15;
+        const maxXPPerMessage = 25;
+        const earnedXP = Math.floor(Math.random() * (maxXPPerMessage - minXPPerMessage + 1)) + minXPPerMessage;
 
-      if (userIndex !== -1) {
-        // User exists in the server's user array, so update the XP
-        const newXp = (server.users[userIndex].XP || 0) + 5; // Increment XP by 5, default to 0 if user doesn't have an XP field
+        // Find the user in the server's user array
+        const userIndex = server?.users?.findIndex((user) => user._user === userId);
 
-        // Update the user's XP in the database
-        await servers.updateOne(
-          { _id: serverId, "users._user": userId },
-          {
-            $set: {
-              "users.$.XP": newXp,
-            },
-          }
-        );
-      } else {
-        // User doesn't exist in the server's user array, so add a new entry for the user
-        await servers.updateOne(
-          { _id: serverId },
-          {
-            $push: {
-              users: {
-                _user: userId,
-                XP: 5,
-                Bank: 0,
-                Wallet: 0,
-                Level: 1,
-                Invites: 0,
-                JoinDate: userJoinAt,
+        if (userIndex !== -1) {
+          // User exists in the server's user array, so update the XP
+          const newXp = (server.users[userIndex].XP || 0) + earnedXP;
+
+          // Update the user's XP in the database
+          await servers.updateOne(
+            { _id: serverId, "users._user": userId },
+            {
+              $set: {
+                "users.$.XP": newXp,
               },
-            },
-          }
-        );
+            }
+          );
+          console.log(`New XP: ${newXp}`);
+        } else {
+          // User doesn't exist in the server's user array, so add a new entry for the user
+          await servers.updateOne(
+            { _id: serverId },
+            {
+              $push: {
+                users: {
+                  _user: userId,
+                  XP: earnedXP,
+                  Bank: 0,
+                  Wallet: 0,
+                  Level: 1,
+                  Invites: 0,
+                  JoinDate: userJoinAt,
+                },
+              },
+            }
+          );
+        }
+        // Set the user's cooldown timestamp to now
+        userCooldowns[userId] = now;
+      } else {
+        // User is on cooldown
       }
     } catch (error) {
       console.log(`Error updating user xp:`, error.message);
@@ -87,7 +102,7 @@ module.exports = {
         logChannel.send(`Event: ${Events.MessageCreate}\nUser: ${message.author.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
       }
     } finally {
-      
+
     }
   },
 };
