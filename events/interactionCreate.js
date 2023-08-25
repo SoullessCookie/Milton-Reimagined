@@ -21,13 +21,7 @@ module.exports = {
 
     const command = interaction.client.commands.get(interaction.commandName);
 
-    const db = await connectToDatabase();
-    const servers = await connectToDatabase().then(db => db.collection('servers'));
-    const serverId = interaction.guild.id;
-    const settings = {
-      serverName: `${interaction.guild.name}`,
-    };
-    await servers.updateOne({ _id: serverId }, { $set: settings }, { upsert: true });
+  
 
     // Load the current counter value from the data file
     let counterData = fs.readFileSync('./data.json');
