@@ -19,7 +19,8 @@ module.exports = {
     .addUserOption(option =>
       option.setName('user')
         .setDescription('The user to check the balance of.')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDMPermission(false),
 
   async execute(interaction) {
     const user = interaction.options.getUser('user');

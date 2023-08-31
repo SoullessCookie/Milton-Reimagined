@@ -1,21 +1,19 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder, MessageAttachment } = require('discord.js');
-
-
+const { MessageAttachment, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('getbeamed')
-    .setDescription('Get Beamed'),
+    .setDescription('Get Beamed')
+    .setDefaultMemberPermissions(0)
+    .setDMPermission(false),
 
   async execute(interaction) {
-
     try {
-      const videoPath = 'media/beamed.mov';
-      const videoAttachment = new MessageAttachment(videoPath);
 
-      await interaction.reply({ files: [videoAttachment], ephemeral: true });
+      await interaction.reply({ files: ["./media/beamed.mov"], ephemeral: true });
     } catch (error) {
+      console.log(error);
       const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
       if (logChannel) {
         logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);

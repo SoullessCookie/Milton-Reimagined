@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { Client, Events, GatewayIntentBits, Collection, ActivityType, AutoModerationRule, EmbedBuilder } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Collection, ActivityType, AutoModerationRule, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
@@ -19,7 +19,8 @@ module.exports = {
     .addNumberOption(option =>
       option.setName('amount')
         .setDescription('Amount to deposit.')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDMPermission(false),
 
   async execute(interaction) {
     const userId = interaction.user.id;

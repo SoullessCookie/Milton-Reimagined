@@ -7,7 +7,8 @@ const wait = require('node:timers/promises').setTimeout;
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('author')
-    .setDescription('About the author/developers'),
+    .setDescription('About the author/developers')
+    .setDMPermission(false),
   async execute(interaction) {
 
     // Create an embed to display information about the author/developers

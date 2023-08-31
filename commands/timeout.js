@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,13 +16,11 @@ module.exports = {
     .addStringOption(option =>
       option.setName('reason')
         .setDescription('Reason for time out')
-        .setRequired(false)),
+        .setRequired(false))
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers | PermissionFlagsBits.BanMembers | PermissionFlagsBits.ModerateMembers)
+    .setDMPermission(false),
 
   async execute(interaction) {
-    // Check if the command user has sufficient permissions to time out a user
-    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'BAN_MEMBERS', 'OWNER', 'MODERATE_MEMBERS'])) {
-      return await interaction.reply('You do not have permission to use this command.');
-    }
 
     // Get the user to be timed out and the duration from the command options
     const userToTimeout = interaction.options.getUser('user');

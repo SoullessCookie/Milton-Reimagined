@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 
 module.exports = {
@@ -9,18 +9,15 @@ module.exports = {
     .addIntegerOption(option =>
       option.setName('amount')
         .setDescription('Number of messages to purge')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+    .setDMPermission(false),
 
   async execute(interaction) {
     // Defer the reply to show the user that the bot is processing the command
     await interaction.deferReply();
     // Wait for 500 milliseconds (0.5 seconds) to simulate processing time (optional)
     await wait(500);
-
-    // Check if the user has the 'MANAGE_MESSAGES' permission
-    if (!interaction.member.permissions.has(['MANAGE_MESSAGES'])) {
-      return await interaction.editReply('You do not have permission to use this command.');
-    }
 
     // Get the amount of messages to purge from the command's options
     const purgeAmount = interaction.options.getInteger('amount');

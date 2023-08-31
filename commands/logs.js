@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 
 // Create a new Discord.js client with specific intents
@@ -18,7 +18,9 @@ module.exports = {
     .addStringOption(option =>
       option.setName('log-channel')
         .setDescription('Channel to send logged events to')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDMPermission(false),
   async execute(interaction) {
     // Create a new MongoDB client
     const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -31,11 +33,6 @@ module.exports = {
       const servers = db.collection('servers');
       const serverId = interaction.guild.id;
       const server = await servers.findOne({ _id: serverId });
-
-      // Check if user has permission to use the command
-      if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_GUILD', 'OWNER'])) {
-        return await interaction.reply('You do not have permission to use this command.');
-      }
 
       const logging = interaction.options.getBoolean('switch');
       const logChannel = interaction.options.getString('log-channel');

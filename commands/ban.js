@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,14 +12,11 @@ module.exports = {
     .addStringOption(option =>
       option.setName('reason')
         .setDescription('Reason for ban')
-        .setRequired(false)),
+        .setRequired(false))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   async execute(interaction) {
-    // Check if the user invoking the command has the necessary permissions
-    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'BAN_MEMBERS', 'OWNER'])) {
-      return await interaction.reply('You do not have permission to use this command.');
-    }
-
     // Get the user to ban and the reason for the ban from the command options
     const userToBan = interaction.options.getUser('user');
     const banReason = interaction.options.getString('reason');

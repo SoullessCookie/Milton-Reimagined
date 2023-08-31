@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 
 // Create a new Discord.js client with specific intents
@@ -22,7 +22,9 @@ module.exports = {
     .addStringOption(option =>
       option.setName('channel')
         .setDescription('Channel to send welcome messages in')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDMPermission(false),
   async execute(interaction) {
     // Create a new MongoDB client
     const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -32,11 +34,6 @@ module.exports = {
       await dbClient.connect();
       const db = dbClient.db('discord');
       const servers = db.collection('servers');
-
-      // Check if user has permission to use the command
-      if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_GUILD', 'OWNER'])) {
-        return await interaction.reply('You do not have permission to use this command.');
-      }
 
       // Get the new welcome message, switch status, and channel from the command options
       const welcomeMessage = interaction.options.getString('message');

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 
 // Create a new Discord.js client with specific intents
@@ -14,7 +14,9 @@ module.exports = {
     .addBooleanOption(option =>
       option.setName('switch')
         .setDescription('False = off')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDMPermission(false),
   async execute(interaction) {
     // Create a new MongoDB client
     const dbClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -28,11 +30,6 @@ module.exports = {
       const serverId = interaction.guild.id;
       const server = await servers.findOne({ _id: serverId });
       const disabledChannelsLeveling = server?.disabledChannelsLeveling || [];
-
-      // Check if user has permission to use the command
-      if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_GUILD', 'OWNER'])) {
-        return await interaction.reply('You do not have permission to use this command.');
-      }
 
       // Get the new welcome message, switch status, and channel from the command options
       const channelId = interaction.channel.id;

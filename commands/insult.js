@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, PermissionFlagsBits } = require('discord.js');
 const getInsult = require("insults").default;
 
 module.exports = {
@@ -9,7 +9,8 @@ module.exports = {
     .addUserOption(option =>
       option.setName('user')
         .setDescription('The user to insult')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDMPermission(false),
   async execute(interaction) {
     // Get the targeted user from the slash command option
     const targetUser = interaction.options.getUser('user');

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 
 // Create a new Discord.js client with specific intents
@@ -31,7 +31,9 @@ module.exports = {
           { name: 'Moderation Commands', value: 'disableModerationCommands' },
           { name: 'Fun Commands', value: 'disableFunCommands' },
           { name: 'Music Player', value: 'disableMusicFeature' },
-        )),
+        ))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDMPermission(false),
 
   async execute(interaction) {
     const db = await connectToDatabase();

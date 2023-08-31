@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,14 +12,11 @@ module.exports = {
     .addStringOption(option =>
       option.setName('reason')
         .setDescription('Reason for unban')
-        .setRequired(false)),
+        .setRequired(false))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
+    .setDMPermission(false),
 
   async execute(interaction) {
-    // Check if the command user has sufficient permissions to unban a user
-    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'BAN_MEMBERS', 'OWNER'])) {
-      return await interaction.reply('You do not have permission to use this command.');
-    }
-
     // Get the user to be unbanned and the unban reason from the command options
     const userToUnban = interaction.options.getUser('user');
     const unbanReason = interaction.options.getString('reason');

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -9,13 +9,8 @@ module.exports = {
   async execute(interaction) {
     // Create an embed with the list of available commands and their descriptions
     const embed = new EmbedBuilder()
-      .setTitle('List of available commands:')
-      .addFields(
-        { name: 'ping', value: 'Check if the bot is online.' },
-        { name: 'info', value: 'Displays information about the bot.' },
-        { name: 'help', value: 'Displays current commands.' },
-        { name: 'adding more soon', value: 'Bruh' },
-      )
+      .setTitle('Command Documentation')
+      .setURL(`https://wrigglysplash.gitbook.io/milton-documentation/commands/administration`)
       .setColor('#FFFF00')
       .setTimestamp();
 

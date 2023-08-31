@@ -1,15 +1,13 @@
 const { SlashCommandBuilder, ChannelType } = require('discord.js');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('nuke')
-    .setDescription('Nukes a channel (not a server nuker)'),
+    .setDescription('Nukes a channel (not a server nuker)')
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .setDMPermission(false),
   async execute(interaction) {
-    // Check if the user has the required permissions to use the command
-    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'MANAGE_CHANNELS', 'OWNER'])) {
-      return await interaction.reply('You do not have permission to use this command.');
-    }
     // Check if the command is being executed in a text channel
     if (interaction.channel.type !== ChannelType.GuildText) {
       return await interaction.reply('This isn\'t a text channel bozo');

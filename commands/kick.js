@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,14 +12,11 @@ module.exports = {
     .addStringOption(option =>
       option.setName('reason')
         .setDescription('Reason for kick')
-        .setRequired(false)),
+        .setRequired(false))
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers | PermissionFlagsBits.KickMembers)
+    .setDMPermission(false),
 
   async execute(interaction) {
-    // Check if the user has the required permissions to use the command
-    if (!interaction.member.permissions.has(['ADMINISTRATOR', 'KICK_MEMBERS', 'OWNER'])) {
-      return await interaction.reply('You do not have permission to use this command.');
-    }
-
     // Get the user to be kicked and the reason for the kick (if provided)
     const userToKick = interaction.options.getUser('user');
     const kickReason = interaction.options.getString('reason');

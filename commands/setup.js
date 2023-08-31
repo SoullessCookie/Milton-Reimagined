@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, PermissionFlagsBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
@@ -15,7 +15,9 @@ async function connectToDatabase() {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('setup')
-    .setDescription('Initial setup for milton'),
+    .setDescription('Initial setup for milton')
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDMPermission(false),
 
   async execute(interaction) {
     const serverId = interaction.guildId;

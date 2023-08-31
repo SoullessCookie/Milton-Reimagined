@@ -1,11 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const wait = require('node:timers/promises').setTimeout;
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('server')
-    .setDescription('Provides information about the server.'),
+    .setDescription('Provides information about the server.')
+    .setDMPermission(false),
 
   async execute(interaction) {
     const { guild } = interaction;

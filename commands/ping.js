@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 // Create a new Discord.js Client instance with the specified intents (Guilds)
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
