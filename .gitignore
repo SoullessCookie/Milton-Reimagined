@@ -1,2 +1,7 @@
+# Ignore these files and directories
 package.json
 premiumfeatures.txt
+.replit
+package-lock.json
+replit.nix
+node_modules/
