@@ -16,9 +16,11 @@ module.exports = {
       .setTitle('Ping')
       .setThumbnail(guild.iconURL({ dynamic: true })) // Set the server's icon as the thumbnail
       .addFields(
-        { name: `Server Latency`, value: `Latency is ${Date.now() - interaction.createdTimestamp}ms.` }, // Calculate the server latency
+        { name: `Server Latency: `, value: `${Date.now() - interaction.createdTimestamp}ms.` }, // Calculate the server latency
         { name: '\u200B', value: '\u200B' }, // Empty field for spacing
-        { name: `API Latency`, value: `Latency is ${Math.round(client.ws.ping)}ms.` }, // Display the client's ping to the API
+        { name: `Websocket Heartbeat: `, value: `${client.ws.ping}ms.` },
+        { name: '\u200B', value: '\u200B' }, // Empty field for spacing
+        { name: `Roundtrip Latency: `, value: `${sent.createdTimestamp - interaction.createdTimestamp}ms.` },
       )
       .setTimestamp(); // Set the timestamp to the current time
 

@@ -14,59 +14,45 @@ async function connectToDatabase() {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('bank')
-    .setDescription('Access your bank')
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('deposit')
-        .setDescription('Deposit money into your bank account.')
-        .addStringOption(option => option.setName('amount').setDescription('Amount to deposit. (Cannot be more than your current balance.)')))
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('withdraw')
-        .setDescription('Withdraw money from your bank account.')
-        .addStringOption(option => option.setName('amount').setDescription('Amount to withdraw. (Cannot be more than your current bank balance.)')))
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('balance')
-        .setDescription('Check the balance of your bank account.')),
+    .setName('deposit')
+    .setDescription('Deposit money from your wallet to your Bank')
+    .addNumberOption(option =>
+      option.setName('amount')
+        .setDescription('Amount to deposit.')
+        .setRequired(true)),
 
   async execute(interaction) {
     const userId = interaction.user.id;
     const serverId = interaction.guild.id;
+    const amount = interaction.options.getNumber('amount');
 
     const db = await connectToDatabase();
-    const servers = db.collection('userdata');
-    const bank = db.collection('userdata');
+    const userdata = db.collection('userdata');
 
 
     try {
-      let server = await bank.findOne({ _id: userId });
-      const userInServer = server?.users?.find(u => u._user === userId);
+      let server = await userdata.findOne({ _id: serverId });
+      const userIndex = server?.users?.findIndex((user) => user._user === userId);
 
-      if (interaction.options.getSubcommand() === 'deposit') {
-        if (userInServer) {
-          await interaction.reply(`Depositing: ${userInServer.bankBalance} into your bank account!`);
+      if (userIndex !== -1) {
+        const currentBank = server.users[userIndex].Bank
+        const currentWallet = server.users[userIndex].Wallet
+
+        if (amount > currentWallet) {
+          await interaction.reply({ content: `You can't deposit more than what is currently in your wallet: <a:miltonStud:1144482317499375786>${currentWallet}`, ephemeral: true });
         } else {
-          await interaction.reply(`No bank account detected, setting up!`);
-          await servers.insertOne({ _id: userId, bankBalance: 0 });
+          await userdata.updateOne(
+            { _id: serverId, "users._user": userId },
+            { $inc: { "users.$.Bank": amount, "users.$.Wallet": -amount } },
+          );
+          await interaction.reply(`Deposited: <a:miltonStud:1144482317499375786>${amount}`);
         }
-      } else if (interaction.options.getSubcommand() === 'withdraw') {
-        if (userInServer) {
-          await interaction.reply(`Withdrawing: ${userInServer.bankBalance} from your bank account!`);
-        } else {
-          await interaction.reply(`No bank account detected, setting up!`);
-          await servers.insertOne({ _id: userId, bankBalance: 0 });
-        }
-      } else if (interaction.options.getSubcommand() === 'balance') {
-        if (userInServer) {
-          await interaction.reply(`You have $${userInServer.bankBalance} in your bank account.`);
-        } else {
-          await interaction.reply(`No bank account detected, setting up!`);
-          await servers.insertOne({ _id: userId, bankBalance: 0 });
-        }
+
+      } else {
+        await interaction.reply(`You havent set up banking yet. Please send a message in the server first. <a:miltonPepeRich:1144487645783801866>`);
       }
     } catch (error) {
+      console.log(error);
       const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
       if (logChannel) {
         logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);

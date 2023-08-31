@@ -1,5 +1,7 @@
 const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 const fs = require('node:fs');
+const chalk = require('chalk');
+const interactionCreated = chalk.whiteBright.bgMagenta.bold;
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildModeration, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildInvites, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.AutoModerationConfiguration, GatewayIntentBits.AutoModerationExecution] });
 
@@ -21,13 +23,17 @@ module.exports = {
 
     const command = interaction.client.commands.get(interaction.commandName);
 
-  
+    const db = await connectToDatabase();
+    const botdata = db.collection('botdata');
+    const botDataDocument = await botdata.findOne({ _id: 1 });
 
-    // Load the current counter value from the data file
-    let counterData = fs.readFileSync('./data.json');
-    let counter = JSON.parse(counterData).counter || 0;
-    counter++;
-    fs.writeFileSync('./data.json', JSON.stringify({ counter }));
+    if (!botDataDocument) {
+      await botdata.insertOne({ _id: 1, commandCount: 1 });
+    } else {
+      const newCommandCount = (botDataDocument.commandCount || 0) + 1;
+      await botdata.updateOne({ _id: 1 }, { $set: { commandCount: newCommandCount } });
+    }
+
 
     if (!command) {
       console.error(`No command matching ${interaction.commandName} was found.`);
@@ -37,8 +43,15 @@ module.exports = {
     try {
       await command.execute(interaction);
     } catch (error) {
-      console.error(error);
-      await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+      console.log(chalk.whiteBright.bgRed.underline('ERROR'));
+      console.log(`Error Running Command:`, error.message);
+
+      const logChannel = client.channels.cache.get(process.env.errorchannelid);
+      if (logChannel) {
+        logChannel.send(`Event: ${Events.InteractionCreate}\nCommand: ${command}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      }
+    } finally {
+
     }
   },
 };

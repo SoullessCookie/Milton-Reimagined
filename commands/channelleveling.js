@@ -56,7 +56,6 @@ module.exports = {
           disabledChannelsLeveling.push(channelId);
           await servers.updateOne({ _id: serverId }, { $set: { disabledChannelsLeveling } });
           await interaction.reply({ content: 'Disabled leveling in this channel.', ephemeral: true });
-          await interaction.reply({ content: 'Disabled leveling in this channel.', ephemeral: true });
         } else {
           await interaction.reply({ content: 'Leveling is already disabled in this channel.', ephemeral: true });
         }

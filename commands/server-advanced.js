@@ -87,7 +87,7 @@ module.exports = {
       .setTimestamp()
 
 
-    try {
+    try {null
       await interaction.reply({ embeds: [embed1, embed2, embed3] });
     } catch (error) {
       const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);

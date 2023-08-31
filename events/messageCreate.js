@@ -23,21 +23,28 @@ module.exports = {
     const channelId = message.channel.id;
 
     const db = await connectToDatabase();
-    const servers = db.collection('userdata');
+    const userdata = db.collection('userdata');
+
+    const servers = db.collection('servers');
+    const serverdata = await servers.findOne({ _id: serverId });
+    const disabledChannelsLeveling = serverdata?.disabledChannelsLeveling || [];
+
+
+
 
     try {
       // Fetch the server data from the database
-      let server = await servers.findOne({ _id: serverId });
+      let server = await userdata.findOne({ _id: serverId });
 
       if (!server) {
         // Server document doesn't exist, create a new one with the users field
-        await servers.insertOne({
+        await userdata.insertOne({
           _id: serverId,
           users: [],
         });
 
         // Now fetch the server data again with the users field initialized
-        server = await servers.findOne({ _id: serverId });
+        server = await userdata.findOne({ _id: serverId });
       }
 
       if (server.disabledChannelsLeveling?.includes(channelId)) {
@@ -57,22 +64,29 @@ module.exports = {
         const userIndex = server?.users?.findIndex((user) => user._user === userId);
 
         if (userIndex !== -1) {
-          // User exists in the server's user array, so update the XP
-          const newXp = (server.users[userIndex].XP || 0) + earnedXP;
+          const index = disabledChannelsLeveling.indexOf(channelId);
 
-          // Update the user's XP in the database
-          await servers.updateOne(
-            { _id: serverId, "users._user": userId },
-            {
-              $set: {
-                "users.$.XP": newXp,
-              },
-            }
-          );
-          console.log(`New XP: ${newXp}`);
+          if (index !== -1) {
+            console.log("Leveling is disabled in this channel")
+          } else {
+            // User exists in the server's user array, so update the XP
+            const newXp = (server.users[userIndex].XP || 0) + earnedXP;
+
+            // Update the user's XP in the database
+            await userdata.updateOne(
+              { _id: serverId, "users._user": userId },
+              {
+                $set: {
+                  "users.$.XP": newXp,
+                },
+              }
+            );
+
+            userCooldowns[userId] = now;
+          }
         } else {
           // User doesn't exist in the server's user array, so add a new entry for the user
-          await servers.updateOne(
+          await userdata.updateOne(
             { _id: serverId },
             {
               $push: {
@@ -83,18 +97,16 @@ module.exports = {
                   Wallet: 0,
                   Level: 1,
                   Invites: 0,
-                  JoinDate: userJoinAt,
                 },
               },
             }
           );
         }
-        // Set the user's cooldown timestamp to now
-        userCooldowns[userId] = now;
       } else {
         // User is on cooldown
       }
     } catch (error) {
+      console.log(chalk.whiteBright.bgRed.underline('ERROR'));
       console.log(`Error updating user xp:`, error.message);
 
       const logChannel = client.channels.cache.get(process.env.errorchannelid);

@@ -1,5 +1,7 @@
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
+const chalk = require('chalk');
+const serverJoin = chalk.whiteBright.bgMagenta.bold;
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -15,12 +17,12 @@ async function connectToDatabase() {
 module.exports = {
   name: Events.GuildCreate,
   async execute(guildCreate) {
-    console.log('GuildCreate event received.');
-    console.log('guildCreate:', guildCreate);
 
+    const guild = guildCreate;
     const serverId = guild.id;
     const serverName = guild.name;
     const memberCount = guild.memberCount;
+    const rulesChannel = guild.rulesChannelId;
 
     const db = await connectToDatabase();
     const servers = await db.collection('servers');
@@ -28,13 +30,14 @@ module.exports = {
     // Check if the server already exists in the database
     const existingServer = await servers.findOne({ _id: serverId });
     if (existingServer) {
-      console.log(`Server with ID ${serverId} already exists in the database.`);
+      console.log(serverJoin(`Joined Server`) + ` Existing ID: ${serverId}`);
       return;
     }
 
     const settings = {
       serverName: `${serverName}`,
       premiumStatus: false,
+      rulesChannel: `${rulesChannel}`,
       logging: true,
       logChannel: ``,
       leveling: true,
@@ -53,8 +56,9 @@ module.exports = {
     // Insert the new server data into the database
     try {
       await servers.insertOne({ _id: serverId, ...settings });
-      console.log(`Server with ID ${serverId} added to the database.`);
+      console.log(serverJoin(`Joined Server`) + ` Added ID: ${serverId}`);
     } catch (error) {
+      console.log(chalk.whiteBright.bgRed.underline('ERROR'));
       console.log(`Error adding server with ID ${serverId} to the database:`, error.message);
 
       const logChannel = interaction.client.channels.cache.get('1133160906361147517');
