@@ -22,8 +22,7 @@ module.exports = {
         .setColor(`#5865F2`)
         .setTitle(`Invite Deleted`)
         .addFields(
-          { name: 'Invite Link', value: `${invite.url}` },
-          { name: 'Code', value: `${invite.code}`, inline: true },
+          { name: 'Invite', value: `${inviteDelete}` },
           { name: 'Reason', value: `${reasonStringFinal}` },
         )
         .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
