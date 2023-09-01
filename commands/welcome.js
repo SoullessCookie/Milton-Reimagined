@@ -15,10 +15,6 @@ module.exports = {
       option.setName('message')
         .setDescription('The new welcome message.')
         .setRequired(true))
-    .addBooleanOption(option =>
-      option.setName('switch')
-        .setDescription('Turn command on/off')
-        .setRequired(true))
     .addStringOption(option =>
       option.setName('channel')
         .setDescription('Channel to send welcome messages in')
@@ -44,11 +40,6 @@ module.exports = {
       // Update or insert the welcome message settings for the specific server in the MongoDB collection
       await servers.updateOne(
         { _id: serverId },
-        { $set: { welcomeCommand } },
-        { upsert: true }
-      );
-      await servers.updateOne(
-        { _id: serverId },
         { $set: { welcomeMessage } },
         { upsert: true }
       );
@@ -64,7 +55,6 @@ module.exports = {
         .setColor(0x26eebf)
         .setTitle(`${guild.name} Welcome Message`)
         .addFields(
-          { name: 'Status', value: `${welcomeCommand}`, inline: true },
           { name: 'Channel', value: `${welcomeChannel}`, inline: true },
           { name: 'Message', value: `${welcomeMessage}`, inline: true },
         )

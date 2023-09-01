@@ -35,6 +35,17 @@ module.exports = {
       const userInServer = server?.users?.find(u => u._user === userId);
 
       if (userInServer) {
+        const embed = new EmbedBuilder()
+          .setColor('#118c4f')
+          .setTitle(`${userName}'s Level`)
+          .addFields(
+            { name: '**Level**', value: `<a:miltonXP:1146962218118815844>  ${userInServer.Level}`, inline: true },
+            { name: '**XP**', value: `<a:miltonStud:1144482317499375786> ${userInServer.XP}`, inline: true },
+          )
+          .setThumbnail(user.displayAvatarURL({ dynamic: true }))
+          .setTimestamp();
+
+        await interaction.reply({ embeds: [embed] });
         await interaction.reply(`${user} is level ${userInServer.Level}`);
       } else {
         await interaction.reply(`${user} is level 1`);
