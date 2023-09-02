@@ -10,10 +10,6 @@ async function connectToDatabase() {
   return mongoClient.db('discord');
 }
 
-client.once('ready', () => {
-  console.log(`Logged in as ${client.user.tag}`);
-});
-
 module.exports = {
   name: Events.GuildBanAdd,
   async execute(guildBanAdd) {
