@@ -45,12 +45,22 @@ module.exports = {
       disabledChannelsLeveling: ``,
       welcome: true,
       welcomeMessage: ``,
+      welcomeChannel: ``,
       inviteTrack: true,
       economy: true,
       automod: true,
       moderationCommands: true,
       funCommands: true,
       musicFeature: true,
+      verification: true,
+      verificationRole: ``,
+      verificationMessage: ``,
+      verificationChannel: ``,
+      verificationDenyKick: false,
+      transcription: false,
+      transcriptionChannelStart: ``,
+      transcriptionChannelEnd: ``,
+      miltonAlertUpdateChannel: ``,
     };
 
     // Insert the new server data into the database

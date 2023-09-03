@@ -16,7 +16,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('setup')
     .setDescription('Initial setup for milton')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .setDMPermission(false),
 
   async execute(interaction) {
@@ -37,19 +37,30 @@ module.exports = {
     const settings = {
       serverName: serverName,
       premiumStatus: false,
+      rulesChannel: `${rulesChannel}`,
       logging: true,
-      logChannel: '',
+      logChannel: ``,
       leveling: true,
-      levelingChannel: '',
-      disabledChannelsLeveling: '',
+      levelingChannel: ``,
+      disabledChannelsLeveling: ``,
       welcome: true,
-      welcomeMessage: '',
+      welcomeMessage: ``,
+      welcomeChannel: ``,
       inviteTrack: true,
       economy: true,
       automod: true,
       moderationCommands: true,
       funCommands: true,
       musicFeature: true,
+      verification: true,
+      verificationRole: ``,
+      verificationMessage: ``,
+      verificationChannel: ``,
+      verificationDenyKick: false,
+      transcription: false,
+      transcriptionChannelStart: ``,
+      transcriptionChannelEnd: ``,
+      miltonAlertUpdateChannel: ``,
     };
 
     // Insert the new server data into the database

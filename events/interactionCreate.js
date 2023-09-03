@@ -16,42 +16,65 @@ async function connectToDatabase() {
   return mongoClient.db('discord');
 }
 
+
 module.exports = {
   name: Events.InteractionCreate,
   async execute(interaction) {
-    if (!interaction.isChatInputCommand()) return;
-
-    const command = interaction.client.commands.get(interaction.commandName);
-
     const db = await connectToDatabase();
-    const botdata = db.collection('botdata');
-    const botDataDocument = await botdata.findOne({ _id: 1 });
+    if (interaction.isChatInputCommand()) {
+      const command = interaction.client.commands.get(interaction.commandName);
 
-    if (!botDataDocument) {
-      await botdata.insertOne({ _id: 1, commandCount: 1 });
-    } else {
-      const newCommandCount = (botDataDocument.commandCount || 0) + 1;
-      await botdata.updateOne({ _id: 1 }, { $set: { commandCount: newCommandCount } });
-    }
+      const botdata = db.collection('botdata');
+      const botDataDocument = await botdata.findOne({ _id: 1 });
 
-
-    if (!command) {
-      console.error(`No command matching ${interaction.commandName} was found.`);
-      return;
-    }
-
-    try {
-      await command.execute(interaction);
-    } catch (error) {
-      console.log(chalk.whiteBright.bgRed.underline('ERROR'));
-      console.log(`Error Running Command:`, error.message);
-
-      const logChannel = client.channels.cache.get(process.env.errorchannelid);
-      if (logChannel) {
-        logChannel.send(`Event: ${Events.InteractionCreate}\nCommand: ${command}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+      if (!botDataDocument) {
+        await botdata.insertOne({ _id: 1, commandCount: 1 });
+      } else {
+        const newCommandCount = (botDataDocument.commandCount || 0) + 1;
+        await botdata.updateOne({ _id: 1 }, { $set: { commandCount: newCommandCount } });
       }
-    } finally {
 
+      if (!command) {
+        console.error(`No command matching ${interaction.commandName} was found.`);
+        return;
+      }
+
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        console.log(chalk.whiteBright.bgRed.underline('ERROR'));
+        console.log(`Error Running Command:`, error.message);
+
+        const logChannel = client.channels.cache.get(process.env.errorchannelid);
+        if (logChannel) {
+          logChannel.send(`Event: ${Events.InteractionCreate}\nCommand: ${command}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+        }
+      }
+    } else if (interaction.isButton()) {
+      const serverId = interaction.guild.id;
+      const userId = interaction.member.user.id;
+      const buttonId = interaction.customId;
+      const servers = db.collection('servers');
+      const serverData = await servers.findOne({ _id: serverId });
+
+      if (buttonId == "accept-verify-button") {
+        await interaction.reply({ content: 'Verified', ephemeral: true });
+        await interaction.deleteReply();
+        try {
+          const verificationRoleFinal = serverData.verificationRole;
+          await interaction.member.roles.add(verificationRoleFinal, `Verified`);
+        } catch (error) {
+          console.log(error);
+          const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
+          if (logChannel) {
+            logChannel.send(`Event: ${interaction.eventName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
+          }
+          await interaction.reply({ content: 'An error occurred while trying to execute this command.', ephemeral: true });
+          await interaction.deleteReply();
+        }
+      }
+    } else if (interaction.isStringSelectMenu()) {
+      // Handle string select menu interaction
     }
-  },
+  }
 };

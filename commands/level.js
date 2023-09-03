@@ -24,6 +24,7 @@ module.exports = {
 
   async execute(interaction) {
     const user = interaction.options.getUser('user');
+    const userName = user.username
     const userId = user.id;
     const serverId = interaction.guild.id;
 
@@ -40,15 +41,24 @@ module.exports = {
           .setTitle(`${userName}'s Level`)
           .addFields(
             { name: '**Level**', value: `<a:miltonXP:1146962218118815844>  ${userInServer.Level}`, inline: true },
-            { name: '**XP**', value: `<a:miltonStud:1144482317499375786> ${userInServer.XP}`, inline: true },
+            { name: '**XP**', value: `<a:miltonXP:1146962218118815844> ${userInServer.XP}`, inline: true },
           )
           .setThumbnail(user.displayAvatarURL({ dynamic: true }))
           .setTimestamp();
 
         await interaction.reply({ embeds: [embed] });
-        await interaction.reply(`${user} is level ${userInServer.Level}`);
       } else {
-        await interaction.reply(`${user} is level 1`);
+        const embed = new EmbedBuilder()
+          .setColor('#118c4f')
+          .setTitle(`${userName}'s Level`)
+          .addFields(
+            { name: '**Level**', value: `<a:miltonXP:1146962218118815844> 1`, inline: true },
+            { name: '**XP**', value: `<a:miltonXP:1146962218118815844> 0`, inline: true },
+          )
+          .setThumbnail(user.displayAvatarURL({ dynamic: true }))
+          .setTimestamp();
+
+        await interaction.reply({ embeds: [embed] });
         await servers.updateOne(
           { _id: serverId },
           {
