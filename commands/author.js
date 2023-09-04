@@ -16,7 +16,7 @@ module.exports = {
       .setColor('#ddff57')
       .setTitle('About the Author')
       .addFields(
-        { name: 'Developers', value: `SoullessCookie and RoseyNose` },
+        { name: 'Developers', value: `SoullessCookie (aka Wriggly) and RoseyNose` },
         { name: 'Github', value: `https://github.com/SoullessCookie/Milton-Reimagined` },
         { name: 'Creation Date', value: `March 9th 2023` },
         { name: 'Language', value: `English` },

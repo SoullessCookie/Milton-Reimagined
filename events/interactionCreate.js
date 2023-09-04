@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
+const { Client, Events, GatewayIntentBits, Collection, ActivityType, WebhookClient, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const fs = require('node:fs');
 const chalk = require('chalk');
 const interactionCreated = chalk.whiteBright.bgMagenta.bold;
@@ -10,6 +10,8 @@ const { MongoClient } = require('mongodb');
 const uri = `mongodb+srv://milton:${process.env.mongoToken}@discord.o4bbgom.mongodb.net/?retryWrites=true&w=majority`;
 
 const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+const webhookClient = new WebhookClient({ url: `${process.env.bugWebhook}` });
 
 async function connectToDatabase() {
   await mongoClient.connect();
@@ -75,6 +77,37 @@ module.exports = {
       }
     } else if (interaction.isStringSelectMenu()) {
       // Handle string select menu interaction
+    } else if (interaction.isModalSubmit()) {
+      if (interaction.customId === 'bugModal') {
+        try {
+          await interaction.reply({ content: 'Thanks for submitting a report! We will do our best to fix your issue ASAP.', ephemeral: true });
+          guildId = interaction.guild.id;
+          user = interaction.user;
+          userId = user.id;
+          const issueTypeResponse = interaction.fields.getTextInputValue('issueType');
+          const guildIdResponse = interaction.fields.getTextInputValue('setGuildId');
+          const issueDescriptionReponse = interaction.fields.getTextInputValue('issueDescription')
+
+
+          const embed = new EmbedBuilder()
+            .setColor('#EE4B2B')
+            .setTitle('(Open) Bug Report')
+            .setThumbnail(user.avatarURL({ dynamic: true }))
+            .addFields(
+              { name: `**Issue Type**`, value: `${issueTypeResponse}` },
+              { name: `**Issue Description**`, value: `${issueDescriptionReponse}` },
+              { name: `**Guild Id**`, value: `${guildIdResponse || guildId}` },
+              { name: `**User Id**`, value: `${userId}` },
+            )
+            .setTimestamp();
+
+          webhookClient.send({
+            embeds: [embed],
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
   }
 };
