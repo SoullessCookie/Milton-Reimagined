@@ -58,6 +58,7 @@ exec('node deploy-commands.js', (error) => {
 const ap = AutoPoster(process.env.topggToken, client)
 
 ap.on('posted', () => {
+  console.log('Updated Top.gg')
 })
 
 client.login(process.env.token);
