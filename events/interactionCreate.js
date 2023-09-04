@@ -80,21 +80,34 @@ module.exports = {
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'bugModal') {
         try {
-          await interaction.reply({ content: 'Thanks for submitting a report! We will do our best to fix your issue ASAP.', ephemeral: true });
+          const { embedColor, issueType } = require('../commands/bug.js');
           guildId = interaction.guild.id;
           user = interaction.user;
           userId = user.id;
-          const issueTypeResponse = interaction.fields.getTextInputValue('issueType');
           const guildIdResponse = interaction.fields.getTextInputValue('setGuildId');
           const issueDescriptionReponse = interaction.fields.getTextInputValue('issueDescription')
 
+          const botdata = db.collection('botdata');
+          const botDataDocument = await botdata.findOne({ _id: 1 });
+
+          if (!botDataDocument) {
+            await botdata.insertOne({ _id: 1, errorCount: 1 });
+          } else {
+            const newErrorCount = (botDataDocument.errorCount || 0) + 1;
+            await botdata.updateOne({ _id: 1 }, { $set: { errorCount: newErrorCount } });
+          }
+
+          const checkmarkImage = 'https://i.imgur.com/wULHOf0.png';
+          const xImage = 'https://i.imgur.com/a63Py6u.png';
+          const embedColorFinal = embedColor;
+          const issueTypeFinal = issueType;
 
           const embed = new EmbedBuilder()
-            .setColor('#EE4B2B')
-            .setTitle('(Open) Bug Report')
-            .setThumbnail(user.avatarURL({ dynamic: true }))
+            .setColor(embedColorFinal)
+            .setAuthor({ name: `Issue #${botDataDocument.errorCount}` })
+            .setTitle(`(Open) ${issueTypeFinal}`)
+            .setThumbnail(xImage)
             .addFields(
-              { name: `**Issue Type**`, value: `${issueTypeResponse}` },
               { name: `**Issue Description**`, value: `${issueDescriptionReponse}` },
               { name: `**Guild Id**`, value: `${guildIdResponse || guildId}` },
               { name: `**User Id**`, value: `${userId}` },
@@ -104,6 +117,7 @@ module.exports = {
           webhookClient.send({
             embeds: [embed],
           });
+          await interaction.reply({ content: 'Thanks for submitting a report! We will do our best to fix your issue ASAP.', ephemeral: true });
         } catch (error) {
           console.log(error);
         }
