@@ -60,5 +60,8 @@ const ap = AutoPoster(process.env.topggToken, client)
 ap.on('posted', () => {
   console.log('Updated Top.gg')
 })
+app.on('error', (err) => { 
+  console.log('Error Updating Top.gg')
+})
 
 client.login(process.env.token);
