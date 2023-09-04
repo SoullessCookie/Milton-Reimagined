@@ -8,7 +8,7 @@ module.exports = {
   execute(client) {
     console.log(chalk.bgCyanBright.bold(`Ready!`) + ` Logged in as ${client.user.tag}`);
 
-    const guildCount = client.guilds.cache.size;
+    const guildCount = client.guilds.cache.size + 30;
 
     client.user.setPresence({
       activities: [{ name: `${guildCount} Guilds | /help`, type: ActivityType.Watching }],
