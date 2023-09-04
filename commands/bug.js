@@ -4,8 +4,8 @@ const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 // This is just a blank command for use later because why not?
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('test')
-    .setDescription('test'),
+    .setName('bug')
+    .setDescription('Allows you to report any bugs with milton.'),
 
   async execute(interaction) {
 
