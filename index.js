@@ -4,6 +4,7 @@ const { Client, Events, GatewayIntentBits, Collection, ActivityType, AutoModerat
 const { token } = require('./config.json');
 const { exec } = require('child_process');
 const { pm2 } = require('pm2');
+const { AutoPoster } = require('topgg-autoposter')
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildModeration, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildInvites, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.AutoModerationConfiguration, GatewayIntentBits.AutoModerationExecution] });
 
@@ -53,5 +54,10 @@ exec('node deploy-commands.js', (error) => {
     return;
   }
 });
+
+const ap = AutoPoster(process.env.topggToken, client)
+
+ap.on('posted', () => {
+})
 
 client.login(process.env.token);
