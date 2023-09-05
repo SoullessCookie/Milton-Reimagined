@@ -16,8 +16,8 @@ module.exports = {
       // Create an EmbedBuilder instance to build the response embed
       const embed = new EmbedBuilder()
         .setColor('#ffd86e')
-        .setTitle('Vote for Milton!!')
-        .setThumbnail(interaction.client.avatarURL({ dynamic: true })) // Set the Milton's icon as the thumbnail
+        .setTitle('**Vote for Milton!!**')
+        .setThumbnail('https://imgur.com/KthB9H3')
         .setURL(`https://top.gg/bot/1083500782164389938/vote`)
         .setTimestamp(); // Set the timestamp to the current time
 
