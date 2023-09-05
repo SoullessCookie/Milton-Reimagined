@@ -5,13 +5,14 @@ module.exports = {
     .setName('invite-delete')
     .setDescription('Delete a specified Invite.')
     .addStringOption(option => option.setName('invite').setDescription('Invite link or code').setRequired(true))
-    .addStringOption(option => option.setName('reasonstring').setDescription('Reason for deleting invite'))
+    .addStringOption(option => option.setName('reason').setDescription('Reason for deleting invite'))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
 
   async execute(interaction) {
     try {
       const inviteDelete = interaction.options.getString('invite');
-      const reasonString = interaction.options.getString('reasonstring') ?? 'No reason provided';
+      const reasonString = interaction.options.getString('reason') ?? 'No reason provided';
       const reasonStringFinal = `Invite deleted by: ${interaction.user.tag}. For the reason: ${reasonString}.`
 
       const invite = await interaction.guild.invites.delete(inviteDelete, {

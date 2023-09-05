@@ -8,7 +8,8 @@ module.exports = {
     .addStringOption(option =>
       option.setName('hex')
         .setDescription('The hex code of the color.')
-        .setRequired(true)),
+        .setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles),
 
   async execute(interaction) {
     // Get the hex code from the command options

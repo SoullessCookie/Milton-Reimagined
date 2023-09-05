@@ -9,7 +9,7 @@ const uri = `mongodb+srv://milton:${process.env.mongoToken}@discord.o4bbgom.mong
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('channelleveling')
+    .setName('channel-leveling')
     .setDescription('Toggles leveling in a specific channel on/off.')
     .addBooleanOption(option =>
       option.setName('switch')

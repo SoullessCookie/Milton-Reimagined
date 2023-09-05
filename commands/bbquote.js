@@ -63,6 +63,14 @@ const hank = [
 ];
 const skylar = [
   'Walter, if I have to hear one more f***ing time that you did it for the family...',
+  'When I Put Everything Into Quicken, Nothing Flashed Red, So That\'s Gotta Mean It\'s Ok, Right?',
+  'We\'ve Come This Far ... What\'s One More?',
+  'I f**ked Ted',
+  'That\'s It. That\'s The Only Good Option. Hold On. Bide My Time, And Wait.',
+  'I Learned From The Best. Something Tells Me Hank Is Here Because Of You - And I\'m Not Forgetting That.',
+  '... Cause God Knows SHE\'S The One With The Really Important Problems!',
+  'I Want My Kids Back. I Want My Life Back. Please Tell Me - How Much Is Enough? How Big Does This Pile Have To Be?',
+  'Someone Needs To Protect This Family From The Man Who Protects This Family.',
 ];
 
 
@@ -94,6 +102,7 @@ module.exports = {
           return saul[randomNumber];
         };
         message = `${getQuoteSaul()}`;
+        name = 'Saul Goodman'
         break;
       case 'walter':
         const getQuoteWalter = () => {
@@ -101,6 +110,7 @@ module.exports = {
           return walter[randomNumber];
         };
         message = `${getQuoteWalter()}`;
+        name = 'Walter White'
         break;
       case 'jesse':
         const getQuoteJesse = () => {
@@ -108,6 +118,7 @@ module.exports = {
           return jesse[randomNumber];
         };
         message = `${getQuoteJesse()}`;
+        name = 'Jesse Pinkman'
         break;
       case 'mike':
         const getQuoteMike = () => {
@@ -115,6 +126,7 @@ module.exports = {
           return mike[randomNumber];
         };
         message = `${getQuoteMike()}`;
+        name = 'Mike Ehrmantraut'
         break;
       case 'hank':
         const getQuoteHank = () => {
@@ -122,6 +134,7 @@ module.exports = {
           return hank[randomNumber];
         };
         message = `${getQuoteHank()}`;
+        name = 'Hank Shrader'
         break;
       case 'skylar':
         const getQuoteSkylar = () => {
@@ -129,20 +142,22 @@ module.exports = {
           return skylar[randomNumber];
         };
         message = `${getQuoteSkylar()}`;
+        name = 'Skylar White'
         break;
       default:
         message = 'Invalid option selected.';
     }
 
     const embed = new EmbedBuilder()
-      .setColor('#ac6f17')
+      .setColor('#2f3136')
       .setTitle(`Breaking Bad Quote`)
-      .addFields({ name: ' ', value: `${message}` })
+      .setDescription(`${message}` + ` \n-${name}`)
       .setTimestamp()
 
     try {
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
+      console.log(error);
       const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
       if (logChannel) {
         logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
@@ -150,5 +165,4 @@ module.exports = {
       await interaction.reply({ content: 'An error occurred while trying to execute this command :)', ephemeral: true });
     }
   },
-
 }

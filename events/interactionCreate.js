@@ -46,6 +46,7 @@ module.exports = {
       } catch (error) {
         console.log(chalk.whiteBright.bgRed.underline('ERROR'));
         console.log(`Error Running Command:`, error.message);
+        console.log(error);
 
         const logChannel = client.channels.cache.get(process.env.errorchannelid);
         if (logChannel) {

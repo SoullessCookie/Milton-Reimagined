@@ -4,11 +4,12 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('invite-create')
     .setDescription('Create an Invite to a specific channel.')
-    .addChannelOption(option => option.setName('invitechannel').setDescription('The channel invite direct to').setRequired(true))
+    .addChannelOption(option => option.setName('invitechannel').setDescription('The channel invite directs to').setRequired(true))
     .addBooleanOption(option => option.setName('temporaryinvite').setDescription('Should members be automatically kicked after 24 hours?'))
     .addNumberOption(option => option.setName('maxage').setMinValue(0).setDescription('Invite duration in hours (0 for forever)'))
     .addNumberOption(option => option.setName('maxuses').setMinValue(0).setDescription('Maximum uses (0 for infinite)'))
     .addStringOption(option => option.setName('reason').setDescription('Reason for creating invite'))
+    .setDefaultMemberPermissions(PermissionFlagsBits.CreateInstantInvite)
     .setDMPermission(false),
 
   async execute(interaction) {
