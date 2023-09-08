@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, Client, GatewayIntentBits, EmbedBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
 const { MongoClient } = require('mongodb');
 
 // Create a new Discord.js client with specific intents
@@ -10,15 +10,17 @@ const uri = `mongodb+srv://milton:${process.env.mongoToken}@discord.o4bbgom.mong
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('welcome')
-    .setDescription('Changes welcome message settings.')
+    .setDescription('Set up/Change welcome message settings.')
     .addStringOption(option =>
       option.setName('message')
         .setDescription('The new welcome message.')
-        .setRequired(true))
-    .addStringOption(option =>
+        .setRequired(true)
+        .setMaxLength(250))
+    .addChannelOption(option =>
       option.setName('channel')
         .setDescription('Channel to send welcome messages in')
-        .setRequired(true))
+        .setRequired(true)
+        .addChannelTypes(ChannelType.GuildText))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
   async execute(interaction) {
@@ -34,7 +36,7 @@ module.exports = {
       // Get the new welcome message, switch status, and channel from the command options
       const welcomeMessage = interaction.options.getString('message');
       const welcomeCommand = interaction.options.getBoolean('switch');
-      const welcomeChannel = interaction.options.getString('channel');
+      const welcomeChannel = interaction.options.getChannel('channel').id;
       const serverId = interaction.guild.id;
 
       // Update or insert the welcome message settings for the specific server in the MongoDB collection

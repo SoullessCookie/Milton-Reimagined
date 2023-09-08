@@ -97,6 +97,9 @@ module.exports = {
                   Wallet: 0,
                   Level: 1,
                   Invites: 0,
+                  Rep: 0,
+                  About: 'Nothing here yet!',
+                  Strikes: 0,
                 },
               },
             }
