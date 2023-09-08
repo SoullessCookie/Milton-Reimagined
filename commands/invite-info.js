@@ -38,6 +38,7 @@ module.exports = {
 
       await interaction.reply({ embeds: [embed] });
     } catch (error) {
+      console.log(error);
       const logChannel = interaction.client.channels.cache.get(process.env.errorchannelid);
       if (logChannel) {
         logChannel.send(`Command: ${interaction.commandName}\nUser: ${interaction.user.tag}\nTime: ${new Date().toUTCString()}\nError: ${error}`);
