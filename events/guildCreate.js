@@ -37,7 +37,7 @@ module.exports = {
     const settings = {
       serverName: `${serverName}`,
       premiumStatus: false,
-      rulesChannel: `${rulesChannel}`,
+      rulesChannel: ``,
       logging: true,
       logChannel: ``,
       leveling: true,
