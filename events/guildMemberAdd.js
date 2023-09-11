@@ -24,27 +24,32 @@ module.exports = {
     const avatarUrlObj = new URL(avatarURL); // Convert the URL string to a URL object
 
     try {
-      // Using undici to make HTTP requests for better performance
-      const { body } = await request(avatarUrlObj);
-
       const serverData = await servers.findOne({ _id: serverId });
-      const rulesChannel = serverData.rulesChannel;
-      const welcomeChannel = serverData.welcomeChannel;
-      const welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{rules}', `**<#${rulesChannel}>**`).replace('{server}', `**${guild.name}**`);
+      const welcome = serverData.welcome;
+      if (welcome === true) {
+        // Using undici to make HTTP requests for better performance
+        const { body } = await request(avatarUrlObj);
+
+        const rulesChannel = serverData.rulesChannel;
+        const welcomeChannel = serverData.welcomeChannel;
+        const welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{rules}', `**<#${rulesChannel}>**`).replace('{server}', `**${guild.name}**`);
 
 
-      const welcome = await new canvafy.WelcomeLeave()
-        .setAvatar(user.displayAvatarURL({ format: 'jpg', dynamic: false }))
-        .setBackground("image", "https://i.imgur.com/0MejY2R.jpg")
-        .setTitle(`Welcome!`)
-        .setDescription(` ${user.username} is member #${guild.memberCount}`)
-        .setBorder("#2a2e35")
-        .setAvatarBorder("#2a2e35")
-        .setOverlayOpacity(0.3)
-        .build();
+        const welcome = await new canvafy.WelcomeLeave()
+          .setAvatar(user.displayAvatarURL({ format: 'jpg', dynamic: false }))
+          .setBackground("image", "https://i.imgur.com/0MejY2R.jpg")
+          .setTitle(`Welcome!`)
+          .setDescription(` ${user.username} is member #${guild.memberCount}`)
+          .setBorder("#2a2e35")
+          .setAvatarBorder("#2a2e35")
+          .setOverlayOpacity(0.3)
+          .build();
 
-      client.channels.fetch(welcomeChannel)
-        .then(channel => channel.send({ content: welcomeMessage, files: [{ attachment: welcome, name: `welcome-${user.id}.png` }] }));
+        client.channels.fetch(welcomeChannel)
+          .then(channel => channel.send({ content: welcomeMessage, files: [{ attachment: welcome, name: `welcome-${user.id}.png` }] }));
+      } else {
+        return;
+      }
     } catch (error) {
       console.error('Error sending embed:', error);
     }
