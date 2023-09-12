@@ -1,4 +1,4 @@
-const { Client, Events, GatewayIntentBits } = require('discord.js');
+/* const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { MongoClient } = require('mongodb');
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] });
 const chalk = require('chalk');
@@ -46,4 +46,4 @@ module.exports = {
   },
 };
 
-client.login(process.env.token);
+client.login(process.env.token); */
