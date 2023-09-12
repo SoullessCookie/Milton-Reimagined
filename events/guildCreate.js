@@ -22,7 +22,6 @@ module.exports = {
     const serverId = guild.id;
     const serverName = guild.name;
     const memberCount = guild.memberCount;
-    const rulesChannel = guild.rulesChannelId;
 
     const db = await connectToDatabase();
     const servers = await db.collection('servers');

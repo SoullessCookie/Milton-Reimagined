@@ -30,6 +30,7 @@ module.exports = {
     try {
       if (channelId == serverData.customVoiceId && oldChannelId !== serverData.customVoiceId) {
         console.log(`${username} joined the custom voice channel`);
+
       }
     } catch (error) {
       console.log(chalk.whiteBright.bgRed.underline('ERROR'));
