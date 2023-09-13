@@ -36,7 +36,8 @@ module.exports = {
       // Get the new welcome message, switch status, and channel from the command options
       const welcomeMessage = interaction.options.getString('message');
       const welcomeCommand = interaction.options.getBoolean('switch');
-      const welcomeChannel = interaction.options.getChannel('channel').id;
+      const welcomeChannelPre = interaction.options.getChannel('channel');
+      const welcomeChannel = welcomeChannelPre.id
       const serverId = interaction.guild.id;
 
       // Update or insert the welcome message settings for the specific server in the MongoDB collection
