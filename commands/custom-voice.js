@@ -39,7 +39,7 @@ module.exports = {
           { $set: { customVoiceId } },
           { upsert: true }
         );
-        interaction.reply(`Created voice channel: <#${customVoiceId}>`);
+        interaction.reply(`Created voice channel: <#${customVoiceId}> \n This feature is still under development and may not work as expected!!!`);
       });
     } catch (error) {
       console.log(error);
