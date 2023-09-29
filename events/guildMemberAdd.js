@@ -33,13 +33,6 @@ module.exports = {
         const rulesChannel = serverData.rulesChannel;
         const welcomeChannel = serverData.welcomeChannel;
 
-        // Check if rulesChannel is defined in the serverData
-        if (rulesChannel === "") {
-          let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`);
-        } else {
-          let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`, '{rules}', `**<#${rulesChannel}>**`);
-        }
-
 
         const welcome = await new canvafy.WelcomeLeave()
           .setAvatar(user.displayAvatarURL({ format: 'jpg', dynamic: false }))
@@ -51,8 +44,16 @@ module.exports = {
           .setOverlayOpacity(0.3)
           .build();
 
-        client.channels.fetch(welcomeChannel)
-          .then(channel => channel.send({ content: welcomeMessage, files: [{ attachment: welcome, name: `welcome-${user.id}.png` }] }));
+        // Check if rulesChannel is defined in the serverData
+        if (serverData.rulesChannel === "") {
+          let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`);
+          client.channels.fetch(welcomeChannel)
+            .then(channel => channel.send({ content: welcomeMessage, files: [{ attachment: welcome, name: `welcome-${user.id}.png` }] }));
+        } else {
+          let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`, '{rules}', `**<#${rulesChannel}>**`);
+          client.channels.fetch(welcomeChannel)
+            .then(channel => channel.send({ content: welcomeMessage, files: [{ attachment: welcome, name: `welcome-${user.id}.png` }] }));
+        }
       } else {
         return;
       }
