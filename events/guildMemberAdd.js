@@ -33,12 +33,11 @@ module.exports = {
         const rulesChannel = serverData.rulesChannel;
         const welcomeChannel = serverData.welcomeChannel;
 
-        // Check if rulesChannel exists in the serverData
-        let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`);
-
         // Check if rulesChannel is defined in the serverData
-        if (rulesChannel) {
-          welcomeMessage = welcomeMessage.replace('{rules}', `**<#${rulesChannel}>**`);
+        if (rulesChannel === "") {
+          let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`);
+        } else {
+          let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`, '{rules}', `**<#${rulesChannel}>**`);
         }
 
 
