@@ -19,9 +19,9 @@ module.exports = {
   async execute(guildCreate) {
 
     const guild = guildCreate;
-    const serverId = guild.id;
-    const serverName = guild.name;
-    const memberCount = guild.memberCount;
+    const serverId = guildCreate.id;
+    const serverName = guildCreate.name;
+    const memberCount = guildCreate.memberCount;
 
     const db = await connectToDatabase();
     const servers = await db.collection('servers');
