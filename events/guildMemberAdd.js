@@ -32,7 +32,14 @@ module.exports = {
 
         const rulesChannel = serverData.rulesChannel;
         const welcomeChannel = serverData.welcomeChannel;
-        const welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{rules}', `**<#${rulesChannel}>**`).replace('{server}', `**${guild.name}**`);
+
+        // Check if rulesChannel exists in the serverData
+        let welcomeMessage = serverData.welcomeMessage.replace('{user}', `**<@${user.id}>**`).replace('{server}', `**${guild.name}**`);
+
+        // Check if rulesChannel is defined in the serverData
+        if (rulesChannel) {
+          welcomeMessage = welcomeMessage.replace('{rules}', `**<#${rulesChannel}>**`);
+        }
 
 
         const welcome = await new canvafy.WelcomeLeave()
